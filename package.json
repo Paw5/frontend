@@ -6,7 +6,9 @@
     "start": "expo start --port 8888",
     "android": "expo start --android --port 8888",
     "ios": "expo start --ios --port 8888",
-    "web": "expo start --web --port 8888"
+    "web": "expo start --web --port 8888",
+    "prepare": "husky install",
+    "test": "echo 'Testing environment not set up.'"
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
@@ -40,7 +42,8 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-react": "^7.31.8",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.0"
   },
   "peerDependencies": {
     "shell-quote": "^1.7.1"

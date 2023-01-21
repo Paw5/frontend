@@ -98,8 +98,6 @@ export default function AccountTab() {
       {/* profile options modal */}
       <Modal
         isVisible={isProfileVisible}
-        onSwipeComplete={() => setProfileVisible(false)}
-        swipeDirection="right"
         animationIn="slideInRight"
         animationOut="slideOutRight"
         hasBackdrop={false}

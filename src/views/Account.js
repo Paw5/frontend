@@ -237,8 +237,6 @@ export default function AccountTab() {
       {/* pets options modal */}
       <Modal
         isVisible={isPetsVisible}
-        onSwipeComplete={() => setPetsVisible(false)}
-        swipeDirection="right"
         animationIn="slideInRight"
         animationOut="slideOutRight"
         hasBackdrop={false}

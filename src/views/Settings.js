@@ -60,6 +60,11 @@ export default function ServicesTab() {
     setNotifVisible(!isNotifVisible);
   };
 
+  const [isDeleteVisible, setDeleteVisible] = useState(false);
+  const toggleDelete = () => {
+    setDeleteVisible(!isDeleteVisible);
+  };
+
   /* toggle help section modal */
   const [isHelpVisible, setHelpVisible] = useState(false);
   const toggleHelp = () => {
@@ -349,6 +354,88 @@ export default function ServicesTab() {
               View Onboarding
             </Text>
           </Pressable>
+          <Pressable style={[styles.settingsItem, { marginRight: 20, width: Dimensions.get('window').width - 40 }]} onPress={toggleDelete}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={styles.settingsText}
+            >
+              Delete Account
+            </Text>
+            <Feather
+              name="chevron-right"
+              size={30}
+              color={pawGrey}
+              style={{ marginRight: -5 }}
+            />
+          </Pressable>
+        </View>
+      </Modal>
+      <Modal
+        isVisible={isDeleteVisible}
+        onSwipeComplete={() => setDeleteVisible(false)}
+        swipeDirection="right"
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        hasBackdrop={false}
+        style={styles.settingsModal}
+      >
+        <View style={{ justifyContent: 'center' }}>
+          <Pressable
+            onPress={toggleDelete}
+            style={{ alignSelf: 'flex-start' }}
+          >
+            <Feather
+              name="chevron-left"
+              size={30}
+              color={pawGrey}
+              style={styles.settingsExitButton}
+            />
+
+          </Pressable>
+
+          <View>
+            <Feather
+              name="alert-octagon"
+              size={100}
+              color={pawGrey}
+              style={styles.settingsIcon}
+            />
+          </View>
+          <View>
+            <Text
+              style={styles.newsHeader}
+            >
+              Are you sure?
+            </Text>
+          </View>
+          <View>
+            <Pressable
+              onPress={toggleDelete}
+              style={{ alignSelf: 'flex-start', top: 50, left: 100 }}
+            >
+              <Feather
+                name="x"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+
+            </Pressable>
+
+            <Pressable
+            // onPress={ // REMOVE ACCOUNT FROM DATABASE AND SEND BACK TO LOGIN }
+              style={{ alignSelf: 'flex-end', right: 100 }}
+            >
+              <Feather
+                name="check"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+
+            </Pressable>
+          </View>
         </View>
       </Modal>
     </View>

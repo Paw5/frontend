@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import lstyles, {
-  pawGreen, pawPink, pawGrey, pawWhite,
+  pawGreen, pawPink, pawWhite,
 } from '../constants/Styles';
 import dstyles, {
   pawYellow,
@@ -93,7 +93,7 @@ export default function ProfilePhotoCard() {
             <Feather
               name="chevron-left"
               size={30}
-              color={isDarkMode === 'light' ? pawYellow : pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.exitPicButton}
             />
 

@@ -196,8 +196,8 @@ export default function PawPostPost() {
           <Feather
             name="chevron-left"
             size={30}
-            color={isDarkMode === 'light' ? pawYellow : pawWhite}
-            style={styles.exitProfButton}
+            color={isDarkMode === 'light' ? pawYellow : pawGrey}
+            style={styles.exitPicButton}
           />
         </Pressable>
         <ProfileClick />

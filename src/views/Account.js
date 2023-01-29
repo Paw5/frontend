@@ -43,6 +43,12 @@ export default function AccountTab() {
     setPetsVisible(!isPetsVisible);
   };
 
+  /* toggle pet section modal */
+  const [isAddVisible, setAddVisible] = useState(false);
+  const toggleAdd = () => {
+    setAddVisible(!isAddVisible);
+  };
+
   const [loggingOut, setLoggingOut] = useState(false);
   const toggleLog = () => {
     setLoggingOut(!loggingOut);
@@ -300,6 +306,7 @@ export default function AccountTab() {
 
             <Pressable style={[styles.menuItem, { marginTop: 20, width: Dimensions.get('window').width - 40 }]}>
               <Text
+                onPress={toggleAdd}
                 adjustsFontSizeToFit
                 numberOfLines={1}
                 style={styles.menuText}
@@ -315,6 +322,125 @@ export default function AccountTab() {
             </Pressable>
 
           </View>
+
+          <Modal
+            isVisible={isAddVisible}
+            animationIn="slideInRight"
+            animationOut="slideOutRight"
+            hasBackdrop={false}
+            style={styles.accountModal}
+          >
+            <View>
+              <Pressable
+                onPress={toggleAdd}
+                style={{ alignSelf: 'flex-start' }}
+              >
+                <Feather
+                  name="chevron-left"
+                  size={30}
+                  color={pawGrey}
+                  style={styles.exitButton}
+                />
+
+              </Pressable>
+
+              <View>
+                <View style={{ justifyContent: 'flex-end' }}>
+                  <Image
+                    resizeMode="cover"
+                    style={styles.profileIcon}
+                    source={miso}
+                  />
+                  <Pressable>
+                    <Feather
+                      name="camera"
+                      size={30}
+                      color={isDarkMode === 'light' ? pawLightGrey : pawPink}
+                      style={styles.cameraIcon}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Name
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  Name
+                </Text>
+              </Pressable>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Birthday
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  Birthday
+                </Text>
+              </Pressable>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Breed
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  Breed
+                </Text>
+              </Pressable>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Color
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  Color
+                </Text>
+              </Pressable>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Weight
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  Weight
+                </Text>
+              </Pressable>
+
+              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                <Text
+                  style={[styles.menuText, styles.accountFields]}
+                >
+                  Microchip ID
+                </Text>
+                <Text
+                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                >
+                  ID Number
+                </Text>
+              </Pressable>
+            </View>
+          </Modal>
 
         </View>
       </Modal>

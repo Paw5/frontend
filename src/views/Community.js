@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
+import * as ImagePicker from 'expo-image-picker';
 import lstyles, { pawWhite, pawGreen, pawPink } from '../constants/Styles';
 import dstyles, {
   pawYellow, pawLightGrey, pawGrey,
@@ -17,17 +18,45 @@ const miso = require('../../assets/petPhotos/miso.jpg');
 
 export default function CommunityTab(bioUpdate) {
   const [styles, setStyles] = useState(lstyles);
+  const [image, setImage] = useState(null); // *** PASS image.uri TO DATABASE? ***
+  const newImageAdded = async () => {
+    const newImage = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+      aspect: [4, 4],
+    });
+    setImage(newImage.uri);
+  };
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);
   }, [isDarkMode]);
 
   const scrollX = new Animated.Value(0);
-
   const [VisisEnabled, VissetIsEnabled] = useState(false);
   const visSwitch = () => VissetIsEnabled((previousState) => !previousState);
+
+  const [isNewPostVisible, setNewPostVisible] = useState(false);
+  const toggleNewPostVisible = () => {
+    setNewPostVisible(!isNewPostVisible);
+  };
+  const [isNewTextVisible, setNewTextVisible] = useState(false);
+  const toggleNewText = () => {
+    setNewTextVisible(!isNewTextVisible);
+    if (isNewPostVisible) {
+      setNewPostVisible(!isNewPostVisible);
+    }
+  };
+
+  const [isNewImageVisible, setNewImageVisible] = useState(false);
+  const toggleNewImage = () => {
+    setNewImageVisible(!isNewImageVisible);
+    if (isNewPostVisible) {
+      setNewPostVisible(!isNewPostVisible);
+    }
+  };
 
   const [isFSVisible, setFSVisible] = useState(false);
   const toggleForumSettings = () => {
@@ -38,7 +67,6 @@ export default function CommunityTab(bioUpdate) {
   const toggleEditBio = () => {
     setEBVisible(!isEBVisible);
   };
-
   return (
     <View style={styles.background}>
       <View style={styles.statusBar} />
@@ -60,6 +88,72 @@ export default function CommunityTab(bioUpdate) {
         />
 
       </Pressable>
+      <Pressable
+        onPress={toggleNewPostVisible}
+        style={{
+          alignSelf: 'flex-end', position: 'absolute', top: 60, right: 10,
+        }}
+      >
+        <Feather
+          name="plus"
+          size={30}
+          color={isDarkMode === 'light' ? pawYellow : pawWhite}
+          style={styles.exitProfButton}
+        />
+
+      </Pressable>
+      <Modal
+        animationType="fade"
+        transparent
+        visible={isNewPostVisible}
+        onBackdropPress={() => {
+          setNewPostVisible(!isNewPostVisible);
+        }}
+        onRequestClose={() => {
+          setNewPostVisible(!isNewPostVisible);
+        }}
+      >
+        <View style={[styles.modalView, {
+          borderWidth: 5, borderColor: pawPink, top: 200,
+        }]}
+        >
+          <View>
+            <Text style={[styles.filterText, { textAlign: 'center', fontSize: 30 }]}>
+              What do you want to upload?
+            </Text>
+          </View>
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+            <Pressable onPress={toggleNewText}>
+              <Feather
+                name="file-plus"
+                size={30}
+                color={pawWhite}
+                style={[styles.settingsExitButton, {
+                  backgroundColor: pawGrey, marginRight: 50, marginTop: 40,
+                }]}
+              />
+            </Pressable>
+            <Pressable onPress={toggleNewImage}>
+              <Feather
+                name="camera"
+                size={30}
+                color={pawWhite}
+                style={[styles.settingsExitButton, {
+                  backgroundColor: pawGrey, marginLeft: 50, marginTop: 40,
+                }]}
+              />
+            </Pressable>
+          </View>
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
+            <Text style={[styles.filterText, { textAlign: 'center', marginRight: 35 }]}>
+              Text Post
+            </Text>
+            <Text style={[styles.filterText, { textAlign: 'center', marginLeft: 35 }]}>
+              Image Post
+            </Text>
+          </View>
+        </View>
+      </Modal>
       <View style={styles.oProfileBio}>
         <Text style={styles.oProfBioText} numberOfLines={6}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit,sed do eiusmod tempor
@@ -156,6 +250,137 @@ export default function CommunityTab(bioUpdate) {
           <ProfilePostCard />
         </ScrollView>
       </Animated.ScrollView>
+      <Modal
+        isVisible={isNewTextVisible}
+        onBackdropPress={() => isNewTextVisible}
+        animationType="slide"
+        hasBackdrop={false}
+        style={styles.newPostModal}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ flexDirection: 'row' }}>
+            <Pressable
+              onPress={toggleNewText}
+              style={{ alignSelf: 'flex-start', margin: 10 }}
+            >
+              <Feather
+                name="chevron-left"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+            <Pressable
+              onPress={toggleNewText/* ** SEND TEXT POST TO DATABASE AND CLOSE MODAL ** */}
+              style={{
+                position: 'absolute', alignSelf: 'flex-end', right: 10, top: 10,
+              }}
+            >
+              <Feather
+                name="share"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+          </View>
+          <View style={[styles.container, {
+            borderRadius: 30, justifyContent: 'center', height: 400, backgroundColor: pawWhite, left: 3.5,
+          }]}
+          >
+            <TextInput
+              style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
+              placeholder="Input Text Post"
+              placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
+              // value={ **NOT SURE WHAT IS NEEDED FOR DATABASE **}
+
+            />
+          </View>
+          <View style={[styles.container, {
+            padding: 0, borderRadius: 30, justifyContent: 'center', height: 50, backgroundColor: pawWhite, left: 3.5,
+          }]}
+          >
+            <TextInput
+              style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
+              placeholder="Add tags"
+              placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
+            />
+          </View>
+
+        </ScrollView>
+      </Modal>
+      <Modal
+        isVisible={isNewImageVisible}
+        onBackdropPress={() => isNewImageVisible}
+        animationType="slide"
+        hasBackdrop={false}
+        style={styles.newPostModal}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ flexDirection: 'row' }}>
+            <Pressable
+              onPress={toggleNewImage}
+              style={{ alignSelf: 'flex-start', margin: 10 }}
+            >
+              <Feather
+                name="chevron-left"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+            <Pressable
+              onPress={toggleNewImage /* ** SEND IMAGE POST TO DATABASE AND CLOSE MODAL ** */}
+              style={{
+                position: 'absolute', alignSelf: 'flex-end', right: 10, top: 10,
+              }}
+            >
+              <Feather
+                name="share"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+          </View>
+          <View>
+            <Pressable onPress={newImageAdded} style={styles.newPicPic}>
+              <Feather
+                name="plus"
+                size={30}
+                color={pawGreen}
+                style={styles.settingsExitButton}
+              />
+              {image && <Image source={{ uri: image }} style={[styles.newPicPic, { position: 'absolute' }]} />}
+            </Pressable>
+
+          </View>
+          <View style={[styles.container, {
+            borderRadius: 30, justifyContent: 'center', height: 200, backgroundColor: pawWhite, left: 3.5,
+          }]}
+          >
+            <TextInput
+              style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
+              placeholder="Input Text Post"
+              placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
+            />
+          </View>
+          <View style={[styles.container, {
+            padding: 0, top: -10, borderRadius: 30, justifyContent: 'center', height: 50, backgroundColor: pawWhite, left: 3.5,
+          }]}
+          >
+            <TextInput
+              style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
+              placeholder="Add tags"
+              placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
+            />
+          </View>
+        </ScrollView>
+      </Modal>
       <Modal
         isVisible={isEBVisible}
         onBackdropPress={() => isEBVisible}

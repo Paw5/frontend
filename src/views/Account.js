@@ -1,6 +1,8 @@
 /* eslint-disable global-require */
 import {
-  View, Text, Dimensions, Pressable, Image, Animated,
+  View, Text, Dimensions, Pressable, Image, Animated, TouchableWithoutFeedback,
+  ScrollView, Platform, TouchableHighlight, TextInput, KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,12 +12,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import AwesomeAlert from 'react-native-awesome-alerts';
-import lstyles, { pawPink, pawGrey, pawWhite } from '../constants/Styles';
+import { Picker } from '@react-native-picker/picker';
+import Accordion from '@eliav2/react-native-collapsible-view';
+import DatePicker from 'react-native-modern-datepicker';
+import lstyles, {
+  pawPink, pawGrey, pawWhite, pawGreen,
+} from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
+import Breeds from '../constants/breedList.json';
+
+const breedList = Breeds.breeds;
 
 const miso = require('../../assets/petPhotos/miso.jpg');
+
+const PickerItem = Picker.Item;
 
 const StatusBarHeight = getStatusBarHeight();
 
@@ -28,6 +40,9 @@ export default function AccountTab() {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);
   }, [isDarkMode]);
+
+  const [selectedItem, setSelectedItem] = useState('Select Breed');
+  const [itemList] = useState(breedList);
 
   const scrollX = new Animated.Value(0);
 
@@ -304,9 +319,8 @@ export default function AccountTab() {
               />
             </View>
 
-            <Pressable style={[styles.menuItem, { marginTop: 20, width: Dimensions.get('window').width - 40 }]}>
+            <Pressable onPress={toggleAdd} style={[styles.menuItem, { marginTop: 20, width: Dimensions.get('window').width - 40 }]}>
               <Text
-                onPress={toggleAdd}
                 adjustsFontSizeToFit
                 numberOfLines={1}
                 style={styles.menuText}
@@ -330,116 +344,201 @@ export default function AccountTab() {
             hasBackdrop={false}
             style={styles.accountModal}
           >
-            <View>
-              <Pressable
-                onPress={toggleAdd}
-                style={{ alignSelf: 'flex-start' }}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               >
-                <Feather
-                  name="chevron-left"
-                  size={30}
-                  color={pawGrey}
-                  style={styles.exitButton}
-                />
-
-              </Pressable>
-
-              <View>
-                <View style={{ justifyContent: 'flex-end' }}>
-                  <Image
-                    resizeMode="cover"
-                    style={styles.profileIcon}
-                    source={miso}
-                  />
-                  <Pressable>
+                <View>
+                  <Pressable
+                    onPress={toggleAdd}
+                    style={{ alignSelf: 'flex-start' }}
+                  >
                     <Feather
-                      name="camera"
+                      name="chevron-left"
                       size={30}
-                      color={isDarkMode === 'light' ? pawLightGrey : pawPink}
-                      style={styles.cameraIcon}
+                      color={pawGrey}
+                      style={styles.exitButton}
                     />
+
                   </Pressable>
+
+                  <View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Image
+                        resizeMode="cover"
+                        style={styles.profileIcon}
+                        source={miso}
+                      />
+                      <Pressable>
+                        <Feather
+                          name="camera"
+                          size={30}
+                          color={isDarkMode === 'light' ? pawLightGrey : pawPink}
+                          style={styles.cameraIcon}
+                        />
+                      </Pressable>
+                    </View>
+                  </View>
+
+                  <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{ marginBottom: Platform.OS === 'android' ? 275 : 275, marginTop: 30 }}
+                  >
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Name
+                      </Text>
+                      <TextInput
+                        autoCorrect={false}
+                        clearTextOnFocus
+                        autoCapitalize="words"
+                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                      >
+                        Name
+                      </TextInput>
+                    </Pressable>
+
+                    <Accordion
+                      style={styles.breedBubble}
+                      touchableComponent
+                      noArrow
+                      title={(
+                        <View>
+                          <Text
+                            style={styles.breedHeader}
+                          >
+                            Birthday
+                          </Text>
+                          <Text
+                            style={styles.breedSelection}
+                          >
+                            None
+                          </Text>
+                        </View>
+                    )}
+                    >
+
+                      <TouchableHighlight>
+                        <DatePicker
+                          options={{
+                            backgroundColor: pawWhite,
+                            textHeaderColor: pawGreen,
+                            textDefaultColor: pawGrey,
+                            selectedTextColor: pawWhite,
+                            mainColor: pawPink,
+                            textSecondaryColor: pawPink,
+                            borderColor: pawWhite,
+                          }}
+                          current="2023-02-4"
+                          selected="2023-02-4"
+                          mode="calendar"
+                          minuteInterval={30}
+                          style={{ borderRadius: 10 }}
+                        />
+                      </TouchableHighlight>
+                    </Accordion>
+
+                    <Accordion
+                      style={styles.breedBubble}
+                      touchableComponent
+                      noArrow
+                      title={(
+                        <View>
+                          <Text
+                            style={styles.breedHeader}
+                          >
+                            Breed
+                          </Text>
+                          <Text
+                            style={styles.breedSelection}
+                          >
+                            {selectedItem}
+                          </Text>
+                        </View>
+                    )}
+                    >
+                      <TouchableHighlight>
+                        <Picker
+                          style={styles.dropdown}
+                          itemStyle={styles.dropdown}
+                          selectedValue={selectedItem}
+                          onValueChange={(index) => setSelectedItem(index)}
+                        >
+                          {itemList.map((value) => (
+                            <PickerItem label={value} value={value} key={value} />
+                          ))}
+                        </Picker>
+                      </TouchableHighlight>
+                    </Accordion>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Color
+                      </Text>
+                      <TextInput
+                        autoCorrect={false}
+                        clearTextOnFocus
+                        autoCapitalize="words"
+                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                      >
+                        Color
+                      </TextInput>
+                    </Pressable>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Weight
+                      </Text>
+                      <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+                        <TextInput
+                          autoCorrect={false}
+                          clearTextOnFocus
+                          keyboardType="decimal-pad"
+                          inputMode="number"
+                          style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                        >
+                          Weight
+                        </TextInput>
+                        <Text style={[styles.menuText, { fontSize: 22, width: 'auto' }]}>
+                          lbs
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Microchip ID
+                      </Text>
+                      <TextInput
+                        autoCorrect={false}
+                        clearTextOnFocus
+                        keyboardType="number-pad"
+                        inputMode="number"
+                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                      >
+                        ID Number
+                      </TextInput>
+                    </Pressable>
+
+                    <Pressable style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={styles.submittext}
+                      >
+                        Submit
+                      </Text>
+                    </Pressable>
+                  </ScrollView>
                 </View>
-              </View>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Name
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  Name
-                </Text>
-              </Pressable>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Birthday
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  Birthday
-                </Text>
-              </Pressable>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Breed
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  Breed
-                </Text>
-              </Pressable>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Color
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  Color
-                </Text>
-              </Pressable>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Weight
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  Weight
-                </Text>
-              </Pressable>
-
-              <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
-                <Text
-                  style={[styles.menuText, styles.accountFields]}
-                >
-                  Microchip ID
-                </Text>
-                <Text
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                >
-                  ID Number
-                </Text>
-              </Pressable>
-            </View>
+              </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
           </Modal>
 
         </View>

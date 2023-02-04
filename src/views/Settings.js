@@ -1,5 +1,5 @@
 import {
-  View, Text, Dimensions, Switch, Pressable,
+  View, ScrollView, Text, Dimensions, Switch, Pressable,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
@@ -78,7 +78,10 @@ export default function ServicesTab() {
 
   return (
     /* background color */
-    <View style={styles.background}>
+    <ScrollView
+      showVerticalScrollIndicator={false}
+      style={styles.background}
+    >
 
       {/* status bar background color */}
       <View style={[styles.statusBar, { marginBottom: 30 }]} />
@@ -374,25 +377,19 @@ export default function ServicesTab() {
       <Modal
         isVisible={isDeleteVisible}
         onSwipeComplete={() => setDeleteVisible(false)}
-        swipeDirection="right"
         animationIn="slideInRight"
         animationOut="slideOutRight"
         hasBackdrop={false}
-        style={styles.settingsModal}
       >
-        <View style={{ justifyContent: 'center' }}>
-          <Pressable
-            onPress={toggleDelete}
-            style={{ alignSelf: 'flex-start' }}
-          >
-            <Feather
-              name="chevron-left"
-              size={30}
-              color={pawGrey}
-              style={styles.settingsExitButton}
-            />
-
-          </Pressable>
+        <View style={[styles.modalView, {
+          borderWidth: 5,
+          backgroundColor: pawPink,
+          borderColor: pawWhite,
+          top: 200,
+          padding: 0,
+          height: 370,
+        }]}
+        >
 
           <View>
             <Feather
@@ -409,10 +406,12 @@ export default function ServicesTab() {
               Are you sure?
             </Text>
           </View>
-          <View>
+          <View style={{ flexDirection: 'row' }}>
             <Pressable
               onPress={toggleDelete}
-              style={{ alignSelf: 'flex-start', top: 50, left: 100 }}
+              style={{
+                alignSelf: 'flex-start', position: 'absolute', top: 30, left: 50,
+              }}
             >
               <Feather
                 name="x"
@@ -425,7 +424,9 @@ export default function ServicesTab() {
 
             <Pressable
             // onPress={ // REMOVE ACCOUNT FROM DATABASE AND SEND BACK TO LOGIN }
-              style={{ alignSelf: 'flex-end', right: 100 }}
+              style={{
+                alignSelf: 'flex-end', position: 'absolute', top: 30, right: 60,
+              }}
             >
               <Feather
                 name="check"
@@ -438,6 +439,6 @@ export default function ServicesTab() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }

@@ -10,7 +10,7 @@ import lstyles, {
   pawGreen, pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
 import dstyles, {
-  pawLightGrey,
+  pawLightGrey, pawYellow,
 } from '../constants/DarkStyles';
 import { flipDarkMode } from '../redux/SettingsSlice';
 
@@ -163,7 +163,7 @@ export default function ServicesTab() {
             <Feather
               name="chevron-left"
               size={30}
-              color={pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.settingsExitButton}
             />
 
@@ -288,7 +288,7 @@ export default function ServicesTab() {
             <Feather
               name="chevron-left"
               size={30}
-              color={pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.settingsExitButton}
             />
 

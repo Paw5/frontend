@@ -113,7 +113,7 @@ export default function AccountTab() {
             <Feather
               name="chevron-left"
               size={30}
-              color={pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.exitButton}
             />
 
@@ -252,7 +252,7 @@ export default function AccountTab() {
             <Feather
               name="chevron-left"
               size={30}
-              color={pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.exitButton}
             />
 

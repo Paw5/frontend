@@ -1,5 +1,5 @@
 import {
-  View, Text, Dimensions, Switch, Pressable,
+  View, ScrollView, Text, Dimensions, Switch, Pressable,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
@@ -60,6 +60,11 @@ export default function ServicesTab() {
     setNotifVisible(!isNotifVisible);
   };
 
+  const [isDeleteVisible, setDeleteVisible] = useState(false);
+  const toggleDelete = () => {
+    setDeleteVisible(!isDeleteVisible);
+  };
+
   /* toggle help section modal */
   const [isHelpVisible, setHelpVisible] = useState(false);
   const toggleHelp = () => {
@@ -73,7 +78,10 @@ export default function ServicesTab() {
 
   return (
     /* background color */
-    <View style={styles.background}>
+    <ScrollView
+      showVerticalScrollIndicator={false}
+      style={styles.background}
+    >
 
       {/* status bar background color */}
       <View style={[styles.statusBar, { marginBottom: 30 }]} />
@@ -349,8 +357,88 @@ export default function ServicesTab() {
               View Onboarding
             </Text>
           </Pressable>
+          <Pressable style={[styles.settingsItem, { marginRight: 20, width: Dimensions.get('window').width - 40 }]} onPress={toggleDelete}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={styles.settingsText}
+            >
+              Delete Account
+            </Text>
+            <Feather
+              name="chevron-right"
+              size={30}
+              color={pawGrey}
+              style={{ marginRight: -5 }}
+            />
+          </Pressable>
         </View>
       </Modal>
-    </View>
+      <Modal
+        isVisible={isDeleteVisible}
+        onSwipeComplete={() => setDeleteVisible(false)}
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        hasBackdrop={false}
+      >
+        <View style={[styles.modalView, {
+          borderWidth: 5,
+          backgroundColor: pawPink,
+          borderColor: pawWhite,
+          top: 200,
+          padding: 0,
+          height: 370,
+        }]}
+        >
+
+          <View>
+            <Feather
+              name="alert-octagon"
+              size={100}
+              color={pawGrey}
+              style={styles.settingsIcon}
+            />
+          </View>
+          <View>
+            <Text
+              style={styles.newsHeader}
+            >
+              Are you sure?
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Pressable
+              onPress={toggleDelete}
+              style={{
+                alignSelf: 'flex-start', position: 'absolute', top: 30, left: 50,
+              }}
+            >
+              <Feather
+                name="x"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+
+            </Pressable>
+
+            <Pressable
+            // onPress={ // REMOVE ACCOUNT FROM DATABASE AND SEND BACK TO LOGIN }
+              style={{
+                alignSelf: 'flex-end', position: 'absolute', top: 30, right: 60,
+              }}
+            >
+              <Feather
+                name="check"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 }

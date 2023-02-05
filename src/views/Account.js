@@ -13,15 +13,17 @@ import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators'
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { Picker } from '@react-native-picker/picker';
-import Accordion from '@eliav2/react-native-collapsible-view';
-import DatePicker from 'react-native-modern-datepicker';
+import Collapsible from '@eliav2/react-native-collapsible-view';
 import lstyles, {
-  pawPink, pawGrey, pawWhite, pawGreen,
+  pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
 import Breeds from '../constants/breedList.json';
+
+const birthdayPickerPromise = import('../components/BirthdayPicker');
+const BirthdayPicker = React.lazy(() => birthdayPickerPromise);
 
 const breedList = Breeds.breeds;
 
@@ -337,6 +339,7 @@ export default function AccountTab() {
 
           </View>
 
+          {/* add options modal */}
           <Modal
             isVisible={isAddVisible}
             animationIn="slideInRight"
@@ -382,7 +385,7 @@ export default function AccountTab() {
 
                   <ScrollView
                     showsVerticalScrollIndicator={false}
-                    style={{ marginBottom: Platform.OS === 'android' ? 275 : 275, marginTop: 30 }}
+                    style={{ marginBottom: Platform.OS === 'android' ? 500 : 500, marginTop: 30 }}
                   >
                     <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
                       <Text
@@ -400,47 +403,11 @@ export default function AccountTab() {
                       </TextInput>
                     </Pressable>
 
-                    <Accordion
-                      style={styles.breedBubble}
-                      touchableComponent
-                      noArrow
-                      title={(
-                        <View>
-                          <Text
-                            style={styles.breedHeader}
-                          >
-                            Birthday
-                          </Text>
-                          <Text
-                            style={styles.breedSelection}
-                          >
-                            None
-                          </Text>
-                        </View>
-                    )}
-                    >
+                    <React.Suspense>
+                      <BirthdayPicker />
+                    </React.Suspense>
 
-                      <TouchableHighlight>
-                        <DatePicker
-                          options={{
-                            backgroundColor: pawWhite,
-                            textHeaderColor: pawGreen,
-                            textDefaultColor: pawGrey,
-                            selectedTextColor: pawWhite,
-                            mainColor: pawPink,
-                            textSecondaryColor: pawPink,
-                            borderColor: pawWhite,
-                          }}
-                          current="2023-02-4"
-                          selected="2023-02-4"
-                          mode="calendar"
-                          minuteInterval={30}
-                          style={{ borderRadius: 10 }}
-                        />
-                      </TouchableHighlight>
-                    </Accordion>
-
-                    <Accordion
+                    <Collapsible
                       style={styles.breedBubble}
                       touchableComponent
                       noArrow
@@ -471,7 +438,7 @@ export default function AccountTab() {
                           ))}
                         </Picker>
                       </TouchableHighlight>
-                    </Accordion>
+                    </Collapsible>
 
                     <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
                       <Text

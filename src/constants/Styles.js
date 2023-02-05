@@ -221,6 +221,19 @@ export default StyleSheet.create({
     color: pawGrey,
     flexBasis: 'auto',
   },
+  datePicker: {
+    backgroundColor: pawWhite,
+    textHeaderColor: pawGreen,
+    textDefaultColor: pawGrey,
+    selectedTextColor: pawWhite,
+    mainColor: pawPink,
+    textSecondaryColor: pawPink,
+    borderColor: pawWhite,
+    defaultFont: 'QuicksandLight',
+  },
+  dateContainer: {
+    borderRadius: 10,
+  },
   breedBubble: {
     alignSelf: 'center',
     width: Dimensions.get('window').width - 40,

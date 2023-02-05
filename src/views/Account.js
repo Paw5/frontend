@@ -394,10 +394,9 @@ export default function AccountTab() {
                         autoCorrect={false}
                         clearTextOnFocus
                         autoCapitalize="words"
+                        placeholder="Name  "
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                      >
-                        Name
-                      </TextInput>
+                      />
                     </Pressable>
 
                     <Accordion
@@ -483,10 +482,9 @@ export default function AccountTab() {
                         autoCorrect={false}
                         clearTextOnFocus
                         autoCapitalize="words"
+                        placeholder="Color  "
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                      >
-                        Color
-                      </TextInput>
+                      />
                     </Pressable>
 
                     <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
@@ -501,10 +499,9 @@ export default function AccountTab() {
                           clearTextOnFocus
                           keyboardType="decimal-pad"
                           inputMode="number"
+                          placeholder="Weight  "
                           style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
-                        >
-                          Weight
-                        </TextInput>
+                        />
                         <Text style={[styles.menuText, { fontSize: 22, width: 'auto' }]}>
                           lbs
                         </Text>
@@ -522,10 +519,9 @@ export default function AccountTab() {
                         clearTextOnFocus
                         keyboardType="number-pad"
                         inputMode="number"
+                        placeholder="ID Number   "
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
-                      >
-                        ID Number
-                      </TextInput>
+                      />
                     </Pressable>
 
                     <Pressable style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}>

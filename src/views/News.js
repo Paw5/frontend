@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
 import lstyles, {
-  pawGreen, pawPink, pawWhite,
+  pawPink, pawWhite,
 } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import EventTab from '../components/EventTab';
@@ -57,24 +57,13 @@ export default function NewsTab() {
           <EventTab />
         </Animated.ScrollView>
 
-        <View style={{
-          borderWidth: 2,
-          borderColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-          borderRadius: 10,
-          padding: 5,
-          width: 115,
-          alignSelf: 'center',
-        }}
-        >
+        <View style={styles.newsAnimScrollView}>
           <RNAnimatedScrollIndicators
             numberOfCards={3}
             scrollWidth={Dimensions.get('window').width}
             activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
             inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
             scrollAnimatedValue={scrollX}
-            style={{
-
-            }}
           />
         </View>
 

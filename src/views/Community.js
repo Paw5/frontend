@@ -76,9 +76,7 @@ export default function CommunityTab(bioUpdate) {
       />
       <Pressable
         onPress={toggleForumSettings}
-        style={{
-          alignSelf: 'flex-start', position: 'absolute', top: 60, left: 10,
-        }}
+        style={styles.forumSettings}
       >
         <Feather
           name="settings"
@@ -90,9 +88,7 @@ export default function CommunityTab(bioUpdate) {
       </Pressable>
       <Pressable
         onPress={toggleNewPostVisible}
-        style={{
-          alignSelf: 'flex-end', position: 'absolute', top: 60, right: 10,
-        }}
+        style={styles.newPost}
       >
         <Feather
           name="plus"
@@ -237,9 +233,7 @@ export default function CommunityTab(bioUpdate) {
         </ScrollView>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{
-            width: Dimensions.get('window').width, left: -10, marginBottom: 75, paddingBottom: 60,
-          }}
+          style={styles.profilePost}
         >
           <ProfilePostCard />
           <ProfilePostCard />
@@ -286,10 +280,7 @@ export default function CommunityTab(bioUpdate) {
               />
             </Pressable>
           </View>
-          <View style={[styles.container, {
-            borderRadius: 30, justifyContent: 'center', height: 400, backgroundColor: pawWhite, left: 3.5,
-          }]}
-          >
+          <View style={[styles.container, styles.textBoxNew]}>
             <TextInput
               style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
               placeholder="Input Text Post"
@@ -298,10 +289,7 @@ export default function CommunityTab(bioUpdate) {
 
             />
           </View>
-          <View style={[styles.container, {
-            padding: 0, borderRadius: 30, justifyContent: 'center', height: 50, backgroundColor: pawWhite, left: 3.5,
-          }]}
-          >
+          <View style={[styles.container, styles.tagsBox]}>
             <TextInput
               style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
               placeholder="Add tags"
@@ -359,20 +347,14 @@ export default function CommunityTab(bioUpdate) {
             </Pressable>
 
           </View>
-          <View style={[styles.container, {
-            borderRadius: 30, justifyContent: 'center', height: 200, backgroundColor: pawWhite, left: 3.5,
-          }]}
-          >
+          <View style={[styles.container, styles.imageTextNew]}>
             <TextInput
               style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
               placeholder="Input Text Post"
               placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
             />
           </View>
-          <View style={[styles.container, {
-            padding: 0, top: -10, borderRadius: 30, justifyContent: 'center', height: 50, backgroundColor: pawWhite, left: 3.5,
-          }]}
-          >
+          <View style={[styles.container, styles.tagsBox]}>
             <TextInput
               style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
               placeholder="Add tags"

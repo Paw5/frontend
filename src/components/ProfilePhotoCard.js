@@ -93,7 +93,7 @@ export default function ProfilePhotoCard() {
             <Feather
               name="chevron-left"
               size={30}
-              color={isDarkMode === 'light' ? pawYellow : pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.exitPicButton}
             />
 

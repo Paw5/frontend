@@ -200,7 +200,7 @@ export default function CommunityTab(bioUpdate) {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{
-            width: Dimensions.get('window').width, left: -12, marginBottom: 75, paddingBottom: 60,
+            width: Dimensions.get('window').width, left: -12, marginBottom: 60, paddingBottom: 60,
           }}
         >
           <View style={styles.photoGrid}>
@@ -424,7 +424,7 @@ export default function CommunityTab(bioUpdate) {
             <Feather
               name="chevron-left"
               size={30}
-              color={pawGrey}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
               style={styles.settingsExitButton}
             />
 

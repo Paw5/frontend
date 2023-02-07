@@ -1,12 +1,12 @@
 import {
-  View, Text, ScrollView, Pressable, Image, Dimensions, Platform,
+  View, Text, ScrollView, Pressable, Image, Dimensions,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import lstyles, {
-  pawGreen, pawPink, pawWhite,
+  pawGreen, pawPink, pawGrey,
 } from '../constants/Styles';
 import dstyles, {
   pawYellow,
@@ -99,19 +99,9 @@ export default function ProfilePhotoCard() {
 
           </Pressable>
         </View>
-        <View style={{ flexDirection: 'row', paddingBottom: 72, marginBottom: 100 }}>
+        <View style={styles.profileCardCard}>
           <View
-            style={{
-              borderColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-              backgroundColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-              borderRadius: 50,
-              width: 6,
-              height: Platform.OS === 'android' ? (Dimensions.get('window').width - 90) : (Dimensions.get('window').width - 125),
-              marginTop: Dimensions.get('window').width,
-              marginBottom: 5,
-              marginLeft: 10,
-              marginRight: 20,
-            }}
+            style={styles.profileCardView}
           />
           <ScrollView style={{ marginTop: Dimensions.get('window').width - 10 }}>
 

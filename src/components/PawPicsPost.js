@@ -1,13 +1,11 @@
 import {
-  View, Text, ScrollView, Pressable, Image, Dimensions, Platform,
+  View, Text, ScrollView, Pressable, Image, Dimensions,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
-import lstyles, {
-  pawGreen, pawPink, pawGrey, pawWhite,
-} from '../constants/Styles';
+import lstyles, { pawPink, pawGrey, pawWhite } from '../constants/Styles';
 import dstyles, {
   pawYellow,
 } from '../constants/DarkStyles';
@@ -65,16 +63,7 @@ export default function PawPostPost() {
         </Pressable>
         <Text style={[styles.picDescription, { left: 2, top: 220 }]}>Descriptive Text</Text>
         <View
-          style={{
-            borderBottomColor: isDarkMode === 'light' ? pawGreen : pawPink,
-            borderBottomWidth: 1,
-            borderRadius: 50,
-            top: 270,
-            marginTop: 5,
-            marginBottom: 5,
-            marginLeft: 20,
-            marginRight: 20,
-          }}
+          style={styles.picLine}
         />
         <Text style={[styles.picTag, { left: 2, top: 265 }]}>Tags</Text>
       </Pressable>
@@ -118,21 +107,12 @@ export default function PawPostPost() {
           </Pressable>
           <Text style={[styles.inspicDescription, { left: -8, top: (Dimensions.get('window').width - 80) }]}>Descriptive Text</Text>
           <View
-            style={{
-              borderBottomColor: isDarkMode === 'light' ? pawGreen : pawPink,
-              borderBottomWidth: 1,
-              borderRadius: 50,
-              top: (Dimensions.get('window').width - 35),
-              marginTop: 5,
-              marginBottom: 5,
-              marginLeft: 10,
-              marginRight: 20,
-            }}
+            style={styles.ispPicLine}
           />
           <Text style={[styles.inspicTag, { left: -8, top: (Dimensions.get('window').width - 37.5) }]}>Tags</Text>
           <Pressable
             onPress={togglePic}
-            style={{ alignSelf: 'flex-start', zIndex: 45, top: -120 }}
+            style={styles.togglePicStyle}
           >
             <Feather
               name="chevron-left"
@@ -143,19 +123,9 @@ export default function PawPostPost() {
 
           </Pressable>
         </View>
-        <View style={{ flexDirection: 'row', paddingBottom: 72, marginBottom: 100 }}>
+        <View style={styles.pawPicsHoldView}>
           <View
-            style={{
-              borderColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-              backgroundColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-              borderRadius: 50,
-              width: 6,
-              height: Platform.OS === 'android' ? (Dimensions.get('window').width - 90) : (Dimensions.get('window').width - 125),
-              marginTop: Dimensions.get('window').width,
-              marginBottom: 5,
-              marginLeft: 10,
-              marginRight: 20,
-            }}
+            style={styles.pawPicsWrappingView}
           />
           <ScrollView style={{ marginTop: Dimensions.get('window').width - 70 }}>
 
@@ -185,13 +155,7 @@ export default function PawPostPost() {
       >
         <Pressable
           onPress={toggleProfile}
-          style={{
-            alignSelf: 'flex-start',
-            position: 'absolute',
-            margin: 10,
-            zIndex: 50,
-            marginTop: Platform.OS === 'android' ? 38 : 56,
-          }}
+          style={styles.toggleProfilePressible}
         >
           <Feather
             name="chevron-left"

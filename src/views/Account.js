@@ -392,7 +392,7 @@ export default function AccountTab() {
 
                   <ScrollView
                     showsVerticalScrollIndicator={false}
-                    style={{ marginBottom: Platform.OS === 'android' ? 500 : 500, marginTop: 30 }}
+                    style={{ marginBottom: Platform.OS === 'android' ? 30 : 30, marginTop: 30 }}
                   >
                     <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
                       <Text
@@ -405,7 +405,7 @@ export default function AccountTab() {
                         clearTextOnFocus
                         autoCapitalize="words"
                         placeholder="Name"
-                        placeholderTextColor={pawGrey}
+                        placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
@@ -495,7 +495,7 @@ export default function AccountTab() {
                         clearTextOnFocus
                         autoCapitalize="words"
                         placeholder="Color"
-                        placeholderTextColor={pawGrey}
+                        placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
@@ -513,7 +513,7 @@ export default function AccountTab() {
                           keyboardType="decimal-pad"
                           inputMode="number"
                           placeholder="Weight"
-                          placeholderTextColor={pawGrey}
+                          placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                           style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
                         />
                         <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
@@ -534,7 +534,7 @@ export default function AccountTab() {
                         keyboardType="number-pad"
                         inputMode="number"
                         placeholder="ID Number"
-                        placeholderTextColor={pawGrey}
+                        placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>

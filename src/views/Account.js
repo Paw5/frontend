@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import {
   View, Text, Dimensions, Pressable, Image, Animated, TouchableWithoutFeedback,
-  ScrollView, Platform, TouchableHighlight, TextInput, KeyboardAvoidingView,
+  ScrollView, Platform, TouchableHighlight, TextInput,
   Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
@@ -13,7 +13,9 @@ import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators'
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { Picker } from '@react-native-picker/picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Collapsible from '@eliav2/react-native-collapsible-view';
+import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
 import lstyles, {
   pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
@@ -21,9 +23,6 @@ import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
 import Breeds from '../constants/breedList.json';
-
-const birthdayPickerPromise = import('../components/BirthdayPicker');
-const BirthdayPicker = React.lazy(() => birthdayPickerPromise);
 
 const breedList = Breeds.breeds;
 
@@ -46,6 +45,8 @@ export default function AccountTab() {
   const [selectedItem, setSelectedItem] = useState('Select Breed');
   const [itemList] = useState(breedList);
 
+  const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
+
   const scrollX = new Animated.Value(0);
 
   /* toggle profile section modal */
@@ -64,6 +65,12 @@ export default function AccountTab() {
   const [isAddVisible, setAddVisible] = useState(false);
   const toggleAdd = () => {
     setAddVisible(!isAddVisible);
+  };
+
+  /* toggle date modal */
+  const [isDateVisible, setDateVisible] = useState(false);
+  const toggleDate = () => {
+    setDateVisible(!isDateVisible);
   };
 
   const [loggingOut, setLoggingOut] = useState(false);
@@ -348,7 +355,7 @@ export default function AccountTab() {
             style={styles.accountModal}
           >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-              <KeyboardAvoidingView
+              <KeyboardAwareScrollView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               >
                 <View>
@@ -397,14 +404,52 @@ export default function AccountTab() {
                         autoCorrect={false}
                         clearTextOnFocus
                         autoCapitalize="words"
-                        placeholder="Name  "
+                        placeholder="Name"
+                        placeholderTextColor={pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
 
-                    <React.Suspense>
-                      <BirthdayPicker />
-                    </React.Suspense>
+                    <Pressable
+                      style={[styles.breedBubble, { width: Dimensions.get('window').width - 40 }]}
+                      onPress={toggleDate}
+                    >
+                      <Text
+                        style={[styles.breedHeader, { paddingTop: 20 }]}
+                      >
+                        Date of Birth
+                      </Text>
+                      <Text
+                        style={styles.breedSelection}
+                      >
+                        {selectedDate}
+                      </Text>
+
+                      <Modal
+                        isVisible={isDateVisible}
+                        onBackdropPress={toggleDate}
+                        animationIn="fadeInUp"
+                        animationInTiming={200}
+                        animationOut="fadeOutDown"
+                        animationOutTiming={200}
+                      >
+                        <DatePicker
+                          options={styles.datePicker}
+                          style={styles.dateContainer}
+                          current={getToday()}
+                          selected={getToday()}
+                          mode="calendar"
+                          onSelectedChange={(date) => {
+                            setSelectedDate(getFormatedDate(date, 'MM/DD/YYYY'));
+                          }}
+                        />
+                        <Pressable>
+                          <Text>
+                            Close
+                          </Text>
+                        </Pressable>
+                      </Modal>
+                    </Pressable>
 
                     <Collapsible
                       style={styles.breedBubble}
@@ -449,7 +494,8 @@ export default function AccountTab() {
                         autoCorrect={false}
                         clearTextOnFocus
                         autoCapitalize="words"
-                        placeholder="Color  "
+                        placeholder="Color"
+                        placeholderTextColor={pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
@@ -466,10 +512,11 @@ export default function AccountTab() {
                           clearTextOnFocus
                           keyboardType="decimal-pad"
                           inputMode="number"
-                          placeholder="Weight  "
+                          placeholder="Weight"
+                          placeholderTextColor={pawGrey}
                           style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
                         />
-                        <Text style={[styles.menuText, { fontSize: 22, width: 'auto' }]}>
+                        <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                           lbs
                         </Text>
                       </View>
@@ -486,7 +533,8 @@ export default function AccountTab() {
                         clearTextOnFocus
                         keyboardType="number-pad"
                         inputMode="number"
-                        placeholder="ID Number   "
+                        placeholder="ID Number"
+                        placeholderTextColor={pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
@@ -500,7 +548,7 @@ export default function AccountTab() {
                     </Pressable>
                   </ScrollView>
                 </View>
-              </KeyboardAvoidingView>
+              </KeyboardAwareScrollView>
             </TouchableWithoutFeedback>
           </Modal>
 

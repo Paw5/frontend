@@ -4,9 +4,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
-import lstyles, {
-  pawGreen, pawPink, pawGrey,
-} from '../constants/Styles';
+import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 
 export default function EventTab() {
@@ -23,26 +21,15 @@ export default function EventTab() {
     <Pressable
       style={styles.eventTab}
     >
-      <View style={{
-        flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 5, paddingRight: 5,
-      }}
-      >
+      <View style={styles.eventHeaderView}>
         <Text style={styles.eventHeader}>Event</Text>
         <Text style={styles.eventDate}>00/00/00</Text>
       </View>
       <View
-        style={{
-          borderBottomColor: isDarkMode === 'light' ? pawGreen : pawPink,
-          borderBottomWidth: 3,
-          borderRadius: 50,
-          marginBottom: 15,
-        }}
+        style={styles.eventBottomBorder}
       />
 
-      <View style={{
-        flexDirection: 'row', justifyContent: 'space-between', width: 'auto', paddingRight: 20,
-      }}
-      >
+      <View style={styles.eventTextView}>
         <Text style={styles.eventText} numberOfLines={4}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit,sed do eiusmod tempor
           incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud

@@ -4,7 +4,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
-import lstyles, { pawGreen, pawPink, pawGrey } from '../constants/Styles';
+import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
@@ -73,15 +73,7 @@ export default function ServNode() {
           style={styles.servStar5}
         />
         <View
-          style={{
-            borderBottomColor: isDarkMode === 'light' ? pawGreen : pawPink,
-            borderBottomWidth: 3,
-            borderRadius: 50,
-            marginTop: 5,
-            marginBottom: 5,
-            marginLeft: 100,
-            marginRight: 10,
-          }}
+          style={styles.servicesLine}
         />
         <Text style={styles.servHeader2}>Descriptive Text</Text>
       </Pressable>

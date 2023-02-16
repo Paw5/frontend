@@ -1,5 +1,5 @@
 import {
-  View, Image, Text, ScrollView, Animated, Dimensions, Platform,
+  View, Image, Text, ScrollView, Animated, Dimensions,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -80,11 +80,7 @@ export default function ProfileClick() {
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{
-            width: Dimensions.get('window').width,
-            left: -12,
-            marginBottom: Platform.OS === 'android' ? 400 : 415,
-          }}
+          style={styles.profilePhotoCardScroll}
         >
           <View style={styles.photoGrid}>
             <ProfilePhotoCard />
@@ -119,9 +115,7 @@ export default function ProfileClick() {
         </ScrollView>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{
-            width: Dimensions.get('window').width, left: -10, marginBottom: 370,
-          }}
+          style={styles.profileScroll}
         >
           <ProfilePostCard />
           <ProfilePostCard />

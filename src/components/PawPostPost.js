@@ -1,13 +1,11 @@
 import {
-  View, Text, ScrollView, Pressable, Image, Dimensions,
+  View, Text, ScrollView, Pressable, Image,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
-import lstyles, {
-  pawGreen, pawPink, pawWhite,
-} from '../constants/Styles';
+import lstyles, { pawPink, pawWhite } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 import PawPostComment from './PawPostComment';
 
@@ -65,12 +63,7 @@ export default function PawPostPost() {
           <View style={styles.inspostContainer}>
             <Pressable
               onPress={togglePost}
-              style={{
-                alignSelf: 'flex-start',
-                position: 'absolute',
-                left: 19,
-                top: 21,
-              }}
+              style={styles.togglePostPressable}
             >
               <Feather
                 name="chevron-left"
@@ -135,33 +128,14 @@ export default function PawPostPost() {
             </ScrollView>
 
             <View
-              style={{
-                borderBottomColor: isDarkMode === 'light' ? pawGreen : pawPink,
-                borderBottomWidth: 1,
-                borderRadius: 50,
-                marginBottom: 5,
-                marginLeft: 10,
-                marginRight: 20,
-              }}
+              style={styles.postLine}
             />
 
             <Text style={styles.inspostTag}>Tags</Text>
           </View>
         </View>
         <View
-          style={{
-            borderColor: isDarkMode === 'light' ? pawGreen : pawWhite,
-            borderWidth: 2,
-            borderRadius: 50,
-            top: (Dimensions.get('window').width + 100),
-            height: (Dimensions.get('window').height / 3),
-            width: 1,
-            marginTop: 5,
-            marginBottom: 5,
-            marginLeft: 20,
-            marginRight: 20,
-            position: 'absolute',
-          }}
+          style={styles.postLineV}
         />
         <ScrollView
           style={{

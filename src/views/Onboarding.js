@@ -24,9 +24,6 @@ import Network from '../util/Network';
 
 const _ = Network();
 
-// const textInputWidth = Dimensions.get('window').width - 60;
-// const maxFontSize = 26;
-
 export default function Onboarding({ setViewedOnboard }) {
   const [isRegisterVisible, setRegisterVisible] = useState(false);
   const [styles, setStyles] = useState(lstyles);
@@ -111,22 +108,6 @@ export default function Onboarding({ setViewedOnboard }) {
     setHideConfirmPassword(!hideConfirmPassword);
   };
 
-  /* const [fontSize, setFontSize] = React.useState(maxFontSize);
-
-  const scaleFontSize = (width) => {
-    const actualWidth = width + fontSize;
-    const scaledSize = Math.min(maxFontSize, fontSize * (textInputWidth / actualWidth));
-
-    setFontSize(scaledSize);
-  };
-
-  const onContentSizeChange = ({ nativeEvent }) => {
-    const { contentSize } = nativeEvent;
-    const { width } = contentSize;
-
-    scaleFontSize(width);
-  }; */
-
   return (
     <View style={{
       flex: 1, backgroundColor: pawPink,
@@ -158,10 +139,7 @@ export default function Onboarding({ setViewedOnboard }) {
       />
 
       <View style={[styles.background, { marginTop: 15 }]}>
-        <View style={{
-          flex: 1, justifyContent: 'center', flexDirection: 'row', alignContent: 'center', marginTop: 2,
-        }}
-        >
+        <View style={styles.signInView}>
 
           <Pressable
             onPress={toggleSignin}

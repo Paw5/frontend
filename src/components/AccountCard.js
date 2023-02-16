@@ -26,7 +26,7 @@ export default function AccountCard() {
           style={styles.accountImage}
           source={miso}
         />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={styles.accountHeaderView}>
           <Text
             style={styles.accountHeader}
           >
@@ -37,7 +37,7 @@ export default function AccountCard() {
               name="x-circle"
               size={30}
               color="indianred"
-              style={{ alignSelf: 'center', paddingLeft: 10, paddingTop: 10 }}
+              style={styles.indianRedXCircle}
             />
           </Pressable>
         </View>

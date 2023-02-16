@@ -937,7 +937,7 @@ export default StyleSheet.create({
   filterText: {
     fontFamily: 'QuicksandSemiBold',
     color: pawGrey,
-    fontSize: 16,
+    fontSize: 26,
   },
   modalView: {
     position: 'absolute',

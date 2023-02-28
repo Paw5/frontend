@@ -19,7 +19,7 @@ import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datep
 import lstyles, {
   pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
-import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
+import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
 import Breeds from '../constants/breedList.json';
@@ -61,7 +61,7 @@ export default function AccountTab() {
     setPetsVisible(!isPetsVisible);
   };
 
-  /* toggle pet section modal */
+  /* toggle add pet section modal */
   const [isAddVisible, setAddVisible] = useState(false);
   const toggleAdd = () => {
     setAddVisible(!isAddVisible);
@@ -339,7 +339,7 @@ export default function AccountTab() {
               <Feather
                 name="plus-circle"
                 size={30}
-                color="indianred"
+                color={isDarkMode === 'light' ? pawGreen : pawPink}
                 style={{ marginRight: -5 }}
               />
             </Pressable>
@@ -366,7 +366,7 @@ export default function AccountTab() {
                     <Feather
                       name="chevron-left"
                       size={30}
-                      color={pawGrey}
+                      color={isDarkMode === 'light' ? pawYellow : pawPink}
                       style={styles.exitButton}
                     />
 

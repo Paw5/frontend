@@ -442,6 +442,7 @@ export default function AccountTab() {
                           onValueChange={
                             (itemValue) => {
                               setAnimalValue(itemValue);
+                              setSelectedItem('Select Breed');
                               if (itemValue === 'dog') {
                                 setAnimal(dBreeds);
                               } else if (itemValue === 'cat') {

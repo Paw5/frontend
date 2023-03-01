@@ -22,9 +22,12 @@ import lstyles, {
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
-import Breeds from '../constants/breedList.json';
+import dogBreeds from '../constants/dogBreeds.json';
+import catBreeds from '../constants/catBreeds.json';
 
-const breedList = Breeds.breeds;
+const dBreeds = dogBreeds.breeds;
+const cBreeds = catBreeds.breeds;
+const emptyList = [];
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
@@ -43,7 +46,9 @@ export default function AccountTab() {
   }, [isDarkMode]);
 
   const [selectedItem, setSelectedItem] = useState('Select Breed');
-  const [itemList] = useState(breedList);
+  const [animalValue, setAnimalValue] = useState('Select Animal');
+  // const [animal, setAnimal] = useState(emptyList);
+  const [itemList, setAnimal] = useState(emptyList);
 
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
 
@@ -409,6 +414,47 @@ export default function AccountTab() {
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                       />
                     </Pressable>
+
+                    <Collapsible
+                      style={styles.breedBubble}
+                      touchableComponent
+                      noArrow
+                      title={(
+                        <View>
+                          <Text
+                            style={styles.breedHeader}
+                          >
+                            Animal
+                          </Text>
+                          <Text
+                            style={styles.breedSelection}
+                          >
+                            {animalValue}
+                          </Text>
+                        </View>
+                    )}
+                    >
+                      <TouchableHighlight>
+                        <Picker
+                          style={styles.dropdown}
+                          itemStyle={styles.dropdown}
+                          selectedValue={animalValue}
+                          onValueChange={
+                            (itemValue) => {
+                              setAnimalValue(itemValue);
+                              if (itemValue === 'dog') {
+                                setAnimal(dBreeds);
+                              } else if (itemValue === 'cat') {
+                                setAnimal(cBreeds);
+                              }
+                            }
+}
+                        >
+                          <PickerItem label="DOG" value="dog" key="dog" />
+                          <PickerItem label="CAT" value="cat" key="cat" />
+                        </Picker>
+                      </TouchableHighlight>
+                    </Collapsible>
 
                     <Pressable
                       style={[styles.breedBubble, { width: Dimensions.get('window').width - 40 }]}

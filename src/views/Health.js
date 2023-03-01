@@ -8,6 +8,7 @@ import lstyles, { pawPink, pawWhite } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import PetCard from '../components/PetCard';
 import HealthComponent from '../components/HealthComponent';
+import UpcomingAppointments from '../components/UpcomingAppointments';
 
 export default function HealthTab() {
   const [styles, setStyles] = useState(lstyles);
@@ -72,7 +73,7 @@ export default function HealthTab() {
           />
         </View>
 
-        <HealthComponent />
+        <UpcomingAppointments />
         <HealthComponent />
         <HealthComponent />
 

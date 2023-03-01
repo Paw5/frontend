@@ -174,6 +174,35 @@ export default StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  appointmentPiece: {
+    padding: 15,
+    paddingBottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  appointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGrey,
+  },
+  addAppointment: {
+    margin: 10,
+    marginBottom: 15,
+    padding: 5,
+    backgroundColor: pawPink,
+    borderRadius: 25,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  appointmentButton: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawWhite,
+    textTransform: 'uppercase',
+  },
 
   /* account styles */
   profileBorder: {

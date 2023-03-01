@@ -13,6 +13,7 @@ export const pawYellow = '#edae49';
 export const pawGreen = '#69a297';
 export const pawGrey = '#333333';
 export const pawLightGrey = '#545454';
+export const pawWhite = '#f9f5ee';
 
 export default StyleSheet.create({
   background: {
@@ -164,6 +165,35 @@ export default StyleSheet.create({
     borderRadius: 50,
     marginLeft: 10,
     marginRight: 10,
+  },
+  appointmentPiece: {
+    padding: 15,
+    paddingBottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  appointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawYellow,
+  },
+  addAppointment: {
+    margin: 10,
+    marginBottom: 15,
+    padding: 5,
+    backgroundColor: pawGreen,
+    borderRadius: 25,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  appointmentButton: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGrey,
+    textTransform: 'uppercase',
   },
   /* account styles */
   profileBorder: {

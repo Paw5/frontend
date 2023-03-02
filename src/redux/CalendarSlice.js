@@ -8,7 +8,7 @@ const calendarSlice = createSlice({
   },
   reducers: {
     setCalendarID: (state, action) => {
-      state.calendarID = action.calendarID;
+      state.calendarID = action.payload.calendarID;
     },
   },
 

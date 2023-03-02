@@ -61,7 +61,7 @@ export default function PetCard() {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
-        dispatch(setCalendarID(createCalendar()));
+        dispatch(setCalendarID(await createCalendar()));
         AsyncStorage.setItem(calID, defaultCalendar);
         getData();
       }
@@ -236,7 +236,7 @@ export default function PetCard() {
               </Pressable>
 
               <Pressable
-                onPress={console.log(defaultCalendar)}
+                onPress={() => { Calendar.createEventAsync(defaultCalendar, formEntry); }}
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
               >
                 <Text

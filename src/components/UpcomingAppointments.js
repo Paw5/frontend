@@ -15,7 +15,7 @@ import lstyles, {
   pawPink,
 } from '../constants/Styles';
 import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
-import { setCalendar } from '../redux/CalendarSlice';
+import { setCalendarID } from '../redux/CalendarSlice';
 
 const calID = '@calendarID';
 
@@ -61,7 +61,7 @@ export default function PetCard() {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
-        dispatch(setCalendar(createCalendar()));
+        dispatch(setCalendarID(createCalendar()));
         AsyncStorage.setItem(calID, defaultCalendar);
         getData();
       }

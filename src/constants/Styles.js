@@ -220,7 +220,7 @@ export default StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     fontFamily: 'QuicksandBold',
-    color: 'crimson',
+    color: '#b81d1d',
   },
 
   /* account styles */

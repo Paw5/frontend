@@ -196,6 +196,24 @@ export default StyleSheet.create({
     color: pawGrey,
     textTransform: 'uppercase',
   },
+  vaccineText: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawYellow,
+  },
+  activeVaccine: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGreen,
+  },
+  expiredVaccine: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: '#d94545',
+  },
   /* account styles */
   profileBorder: {
     backgroundColor: pawYellow,

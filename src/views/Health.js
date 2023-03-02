@@ -11,6 +11,7 @@ import PetCard from '../components/PetCard';
 import UpcomingAppointments from '../components/UpcomingAppointments';
 import WalkGraph from '../components/WalkGraph';
 import WalkGoals from '../components/WalkGoals';
+import VaccineReminder from '../components/VaccineReminder';
 
 export default function HealthTab() {
   const [styles, setStyles] = useState(lstyles);
@@ -78,6 +79,7 @@ export default function HealthTab() {
         <UpcomingAppointments />
         <WalkGraph />
         <WalkGoals />
+        <VaccineReminder />
 
       </ScrollView>
     </View>

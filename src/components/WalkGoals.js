@@ -23,7 +23,7 @@ const darkChart = (opacity = 1) => `rgba(237, 174, 73, ${opacity})`;
 
 const PickerItem = Picker.Item;
 
-export default function PetCard() {
+export default function WalkGoals() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
 
@@ -204,10 +204,10 @@ export default function PetCard() {
                     itemStyle={styles.dropdown}
                     selectedValue={goalName}
                     onValueChange={
-                            (itemValue) => {
-                              setGoalName(itemValue);
-                            }
-}
+                        (itemValue) => {
+                          setGoalName(itemValue);
+                        }
+                    }
                   >
                     <PickerItem label="Walk" value="Walk" key="Walk" />
                     <PickerItem label="Training" value="Training" key="Training" />

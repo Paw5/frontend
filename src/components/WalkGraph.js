@@ -20,7 +20,7 @@ const darkChart = (opacity = 1) => `rgba(237, 174, 73, ${opacity})`;
 const lightDots = () => pawPink;
 const darkDots = () => pawGreen;
 
-export default function PetCard() {
+export default function WalkGraph() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
 
@@ -61,8 +61,8 @@ export default function PetCard() {
     backgroundGradientTo: pawWhite,
     backgroundGradientToOpacity: 0,
     color: isDarkMode === 'light' ? darkChart : lightChart,
-    fillShadowGradient: pawWhite,
-    fillShadowGradientTo: pawWhite,
+    fillShadowGradient: isDarkMode === 'light' ? pawWhite : pawGreen,
+    fillShadowGradientTo: isDarkMode === 'light' ? pawWhite : pawGreen,
   };
 
   return (

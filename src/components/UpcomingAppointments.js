@@ -43,7 +43,7 @@ async function getDefaultCalendarSource() {
 //   return newCalendarID;
 // }
 
-export default function PetCard() {
+export default function UpcomingAppointments() {
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const dispatch = useDispatch();
 

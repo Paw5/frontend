@@ -3,6 +3,14 @@
     "name": "IC-Tech-4901",
     "slug": "IC-Tech-4901",
     "version": "1.0.0",
+    "plugins": [
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "The app needs to access your calendar."
+        }
+      ]
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

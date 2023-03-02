@@ -3,18 +3,78 @@ import {
   Platform, TextInput, Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
 import dateFormat from 'dateformat';
-import { useSelector } from 'react-redux';
+import * as Calendar from 'expo-calendar';
 import lstyles, {
   pawPink,
 } from '../constants/Styles';
 import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
+import { setCalendar } from '../redux/CalendarSlice';
+
+const calID = '@calendarID';
+
+async function getDefaultCalendarSource() {
+  const defaultCalendar = await Calendar.getDefaultCalendarAsync();
+  return defaultCalendar.source;
+}
+
+async function createCalendar() {
+  const defaultCalendarSource = Platform.OS === 'ios'
+    ? await getDefaultCalendarSource()
+    : { isLocalAccount: true, name: 'Paw5' };
+  const newCalendarID = await Calendar.createCalendarAsync({
+    title: 'Paw5',
+    color: 'blue',
+    entityType: Calendar.EntityTypes.EVENT,
+    sourceId: defaultCalendarSource.id,
+    source: defaultCalendarSource,
+    name: 'internalCalendarName',
+    ownerAccount: 'personal',
+    accessLevel: Calendar.CalendarAccessLevel.OWNER,
+  });
+
+  console.log(`Your new calendar ID is: ${newCalendarID}`);
+  return newCalendarID;
+}
 
 export default function PetCard() {
+  const dispatch = useDispatch();
+  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+
+  const getData = async () => {
+    try {
+      const data = await AsyncStorage.getItem(calID);
+
+      return data;
+    } catch (e) {
+      return (e);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === 'granted') {
+        dispatch(setCalendar(createCalendar()));
+        AsyncStorage.setItem(calID, defaultCalendar);
+        getData();
+      }
+    })();
+  }, []);
+
+  const [formEntry, setFormEntry] = useState({});
+  const updateFormEntry = (key, value) => {
+    const newFormEntry = formEntry;
+    newFormEntry[key] = value;
+    setFormEntry(newFormEntry);
+  };
+
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
 
@@ -118,6 +178,7 @@ export default function PetCard() {
                   placeholder="Name"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                   style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  onChangeText={(text) => updateFormEntry('title', text)}
                 />
               </Pressable>
 
@@ -134,6 +195,7 @@ export default function PetCard() {
                   placeholder="Location"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                   style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  onChangeText={(text) => updateFormEntry('location', text)}
                 />
               </Pressable>
 
@@ -167,9 +229,21 @@ export default function PetCard() {
                     selected={getToday()}
                     onSelectedChange={(date) => {
                       setSelectedDate(date);
+                      updateFormEntry('startDate', date);
                     }}
                   />
                 </Modal>
+              </Pressable>
+
+              <Pressable
+                onPress={console.log(defaultCalendar)}
+                style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+              >
+                <Text
+                  style={styles.submittext}
+                >
+                  Add to Calendar
+                </Text>
               </Pressable>
             </View>
           </KeyboardAwareScrollView>

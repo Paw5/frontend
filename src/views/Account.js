@@ -490,11 +490,6 @@ export default function AccountTab() {
                             setSelectedDate(getFormatedDate(date, 'MM/DD/YYYY'));
                           }}
                         />
-                        <Pressable>
-                          <Text>
-                            Close
-                          </Text>
-                        </Pressable>
                       </Modal>
                     </Pressable>
 

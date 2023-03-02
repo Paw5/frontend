@@ -7,8 +7,10 @@ import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators'
 import lstyles, { pawPink, pawWhite } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import PetCard from '../components/PetCard';
-import HealthComponent from '../components/HealthComponent';
+// import HealthComponent from '../components/HealthComponent';
 import UpcomingAppointments from '../components/UpcomingAppointments';
+import WalkGraph from '../components/WalkGraph';
+import WalkGoals from '../components/WalkGoals';
 
 export default function HealthTab() {
   const [styles, setStyles] = useState(lstyles);
@@ -74,8 +76,8 @@ export default function HealthTab() {
         </View>
 
         <UpcomingAppointments />
-        <HealthComponent />
-        <HealthComponent />
+        <WalkGraph />
+        <WalkGoals />
 
       </ScrollView>
     </View>

@@ -24,28 +24,28 @@ async function getDefaultCalendarSource() {
   return defaultCalendar.source;
 }
 
-async function createCalendar() {
-  const defaultCalendarSource = Platform.OS === 'ios'
-    ? await getDefaultCalendarSource()
-    : { isLocalAccount: true, name: 'Paw5' };
-  const newCalendarID = await Calendar.createCalendarAsync({
-    title: 'Paw5',
-    color: '#69a297',
-    entityType: Calendar.EntityTypes.EVENT,
-    sourceId: defaultCalendarSource.id,
-    source: defaultCalendarSource,
-    name: 'internalCalendarName',
-    ownerAccount: 'personal',
-    accessLevel: Calendar.CalendarAccessLevel.OWNER,
-  });
+// async function createCalendar() {
+//   const defaultCalendarSource = Platform.OS === 'ios'
+//     ? await getDefaultCalendarSource()
+//     : { isLocalAccount: true, name: 'Paw5' };
+//   const newCalendarID = await Calendar.createCalendarAsync({
+//     title: 'Paw5',
+//     color: '#69a297',
+//     entityType: Calendar.EntityTypes.EVENT,
+//     sourceId: defaultCalendarSource.id,
+//     source: defaultCalendarSource,
+//     name: 'internalCalendarName',
+//     ownerAccount: 'personal',
+//     accessLevel: Calendar.CalendarAccessLevel.OWNER,
+//   });
 
-  console.log(`Your new calendar ID is: ${newCalendarID}`);
-  return newCalendarID;
-}
+//   console.log(`Your new calendar ID is: ${newCalendarID}`);
+//   return newCalendarID;
+// }
 
 export default function PetCard() {
-  const dispatch = useDispatch();
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+  const dispatch = useDispatch();
 
   const getData = async () => {
     try {

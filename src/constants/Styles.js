@@ -154,7 +154,8 @@ export default StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
     marginBottom: 20,
-    height: 200,
+    justifyContent: 'center',
+    flexDirection: 'column',
   },
   healthHeader: {
     fontSize: 20,

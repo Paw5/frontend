@@ -30,7 +30,7 @@ async function createCalendar() {
     : { isLocalAccount: true, name: 'Paw5' };
   const newCalendarID = await Calendar.createCalendarAsync({
     title: 'Paw5',
-    color: 'blue',
+    color: '#69a297',
     entityType: Calendar.EntityTypes.EVENT,
     sourceId: defaultCalendarSource.id,
     source: defaultCalendarSource,

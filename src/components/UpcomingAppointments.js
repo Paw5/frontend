@@ -38,7 +38,6 @@ async function createCalendar() {
     accessLevel: Calendar.CalendarAccessLevel.OWNER,
   });
 
-  console.log(`Your new calendar ID is: ${newCalendarID}`);
   newID = newCalendarID;
 }
 
@@ -49,14 +48,28 @@ export default function UpcomingAppointments() {
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === 'granted') {
+      if (status === 'granted' && defaultCalendar === 'none') {
         await createCalendar();
-        console.log(`${newID} before dispatch`);
-        console.log(typeof newID);
         dispatch(setCalendarID(newID));
       }
     })();
   }, []);
+
+  function addHour(date) {
+    const endHour = new Date(date);
+    return endHour.setHours(endHour.getHours() + 1);
+  }
+
+  async function addEvent(ID, event) {
+    const newEvent = {
+      title: event.title,
+      startDate: new Date(event.startDate),
+      endDate: new Date(addHour(event.startDate)),
+      location: event.location,
+    };
+
+    await Calendar.createEventAsync(ID, newEvent);
+  }
 
   const [formEntry, setFormEntry] = useState({});
   const updateFormEntry = (key, value) => {
@@ -67,8 +80,6 @@ export default function UpcomingAppointments() {
 
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-
-  console.log(`defaultCalender: ${defaultCalendar}`);
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -221,14 +232,16 @@ export default function UpcomingAppointments() {
                     selected={getToday()}
                     onSelectedChange={(date) => {
                       setSelectedDate(date);
-                      updateFormEntry('startDate', date);
+                      updateFormEntry('startDate', new Date(date));
                     }}
                   />
                 </Modal>
               </Pressable>
 
               <Pressable
-                onPress={() => { Calendar.createEventAsync(defaultCalendar, formEntry); }}
+                onPress={() => {
+                  addEvent(defaultCalendar, formEntry);
+                }}
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
               >
                 <Text

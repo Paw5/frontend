@@ -3,7 +3,6 @@ import {
   Platform, TextInput, Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -17,53 +16,44 @@ import lstyles, {
 import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
 import { setCalendarID } from '../redux/CalendarSlice';
 
-const calID = '@calendarID';
+let newID = '';
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
   return defaultCalendar.source;
 }
 
-// async function createCalendar() {
-//   const defaultCalendarSource = Platform.OS === 'ios'
-//     ? await getDefaultCalendarSource()
-//     : { isLocalAccount: true, name: 'Paw5' };
-//   const newCalendarID = await Calendar.createCalendarAsync({
-//     title: 'Paw5',
-//     color: '#69a297',
-//     entityType: Calendar.EntityTypes.EVENT,
-//     sourceId: defaultCalendarSource.id,
-//     source: defaultCalendarSource,
-//     name: 'internalCalendarName',
-//     ownerAccount: 'personal',
-//     accessLevel: Calendar.CalendarAccessLevel.OWNER,
-//   });
+async function createCalendar() {
+  const defaultCalendarSource = Platform.OS === 'ios'
+    ? await getDefaultCalendarSource()
+    : { isLocalAccount: true, name: 'Paw5' };
+  const newCalendarID = await Calendar.createCalendarAsync({
+    title: 'Paw5',
+    color: '#69a297',
+    entityType: Calendar.EntityTypes.EVENT,
+    sourceId: defaultCalendarSource.id,
+    source: defaultCalendarSource,
+    name: 'internalCalendarName',
+    ownerAccount: 'personal',
+    accessLevel: Calendar.CalendarAccessLevel.OWNER,
+  });
 
-//   console.log(`Your new calendar ID is: ${newCalendarID}`);
-//   return newCalendarID;
-// }
+  console.log(`Your new calendar ID is: ${newCalendarID}`);
+  newID = newCalendarID;
+}
 
 export default function UpcomingAppointments() {
-  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const dispatch = useDispatch();
-
-  const getData = async () => {
-    try {
-      const data = await AsyncStorage.getItem(calID);
-
-      return data;
-    } catch (e) {
-      return (e);
-    }
-  };
+  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
 
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
       if (status === 'granted') {
-        dispatch(setCalendarID(await createCalendar()));
-        AsyncStorage.setItem(calID, defaultCalendar);
-        getData();
+        await createCalendar();
+        console.log(`${newID} before dispatch`);
+        console.log(typeof newID);
+        dispatch(setCalendarID(newID));
       }
     })();
   }, []);
@@ -77,6 +67,8 @@ export default function UpcomingAppointments() {
 
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
+
+  console.log(`defaultCalender: ${defaultCalendar}`);
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -177,7 +169,7 @@ export default function UpcomingAppointments() {
                   autoCapitalize="words"
                   placeholder="Name"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                   onChangeText={(text) => updateFormEntry('title', text)}
                 />
               </Pressable>
@@ -194,7 +186,7 @@ export default function UpcomingAppointments() {
                   autoCapitalize="words"
                   placeholder="Location"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                   onChangeText={(text) => updateFormEntry('location', text)}
                 />
               </Pressable>

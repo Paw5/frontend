@@ -172,7 +172,9 @@ export default function WalkGraph() {
                     inputMode="number"
                     placeholder="00"
                     placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                    style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                    style={[styles.menuText, {
+                      fontSize: 22, width: 'auto', paddingRight: 5, marginRight: Platform.OS === 'android' ? 20 : 0,
+                    }]}
                   />
                   <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                     mins
@@ -194,7 +196,9 @@ export default function WalkGraph() {
                     inputMode="number"
                     placeholder="00"
                     placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                    style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                    style={[styles.menuText, {
+                      fontSize: 22, width: 'auto', paddingRight: 5, marginRight: Platform.OS === 'android' ? 20 : 0,
+                    }]}
                   />
                   <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                     miles

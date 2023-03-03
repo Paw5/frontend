@@ -384,6 +384,7 @@ export default StyleSheet.create({
     backgroundColor: pawGreen,
     width: Dimensions.get('window').width,
     margin: 0,
+    height: Dimensions.get('window').height,
     marginTop: Platform.OS === 'android' ? 0 : StatusBarHeight,
     justifyContent: 'flex-start',
     paddingTop: 20,

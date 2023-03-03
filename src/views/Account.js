@@ -411,7 +411,7 @@ export default function AccountTab() {
                         autoCapitalize="words"
                         placeholder="Name"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                       />
                     </Pressable>
 
@@ -556,7 +556,9 @@ export default function AccountTab() {
                           inputMode="number"
                           placeholder="Weight"
                           placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                          style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                          style={[styles.menuText, {
+                            fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+                          }]}
                         />
                         <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                           lbs
@@ -577,7 +579,7 @@ export default function AccountTab() {
                         inputMode="number"
                         placeholder="ID Number"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                       />
                     </Pressable>
 

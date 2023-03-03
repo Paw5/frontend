@@ -118,7 +118,7 @@ export default function WalkGoals() {
               autoCapitalize="words"
               placeholder="Name"
               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-              style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
             />
           </Pressable>
 

@@ -5,6 +5,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
@@ -13,7 +14,7 @@ import * as Calendar from 'expo-calendar';
 import lstyles, {
   pawPink,
 } from '../constants/Styles';
-import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
+import dstyles, { pawYellow, pawGrey, pawGreen } from '../constants/DarkStyles';
 import { setCalendarID } from '../redux/CalendarSlice';
 
 let newID = '';
@@ -70,6 +71,11 @@ export default function UpcomingAppointments() {
 
     await Calendar.createEventAsync(ID, newEvent);
   }
+
+  const [eventAdded, showEventAdded] = useState(false);
+  const toggleSuccess = () => {
+    showEventAdded(!eventAdded);
+  };
 
   const [formEntry, setFormEntry] = useState({});
   const updateFormEntry = (key, value) => {
@@ -241,6 +247,7 @@ export default function UpcomingAppointments() {
               <Pressable
                 onPress={() => {
                   addEvent(defaultCalendar, formEntry);
+                  toggleSuccess();
                 }}
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
               >
@@ -250,6 +257,19 @@ export default function UpcomingAppointments() {
                   Add to Calendar
                 </Text>
               </Pressable>
+
+              <AwesomeAlert
+                show={eventAdded}
+                title="Event Added!"
+                confirmText="Yay!"
+                titleStyle={styles.settingsText}
+                contentContainerStyle={styles.alertBackground}
+                showConfirmButton
+                confirmButtonTextStyle={styles.confirmButton}
+                onConfirmPressed={toggleSuccess}
+                style={{ borderRadius: 50, overflow: 'hidden' }}
+                confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+              />
             </View>
           </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>

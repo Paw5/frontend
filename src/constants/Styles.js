@@ -470,12 +470,20 @@ export default StyleSheet.create({
     fontSize: 24,
     width: (Dimensions.get('window').width - 120),
     fontWeight: '600',
+    textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 1,
     fontFamily: 'QuicksandBold',
     color: pawGrey,
     flexBasis: 'auto',
     paddingRight: 10,
+  },
+  confirmButton: {
+    fontFamily: 'QuicksandBold',
+    color: pawWhite,
+  },
+  alertBackground: {
+    backgroundColor: pawWhite,
   },
   settingsItemOnboard: {
     alignSelf: 'center',

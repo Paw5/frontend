@@ -13,6 +13,7 @@ export const pawYellow = '#edae49';
 export const pawGreen = '#69a297';
 export const pawGrey = '#333333';
 export const pawLightGrey = '#545454';
+export const pawWhite = '#f9f5ee';
 
 export default StyleSheet.create({
   background: {
@@ -145,7 +146,8 @@ export default StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
     marginBottom: 20,
-    height: 200,
+    justifyContent: 'center',
+    flexDirection: 'column',
   },
   healthHeader: {
     fontSize: 20,
@@ -164,6 +166,53 @@ export default StyleSheet.create({
     borderRadius: 50,
     marginLeft: 10,
     marginRight: 10,
+  },
+  appointmentPiece: {
+    padding: 15,
+    paddingBottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  appointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawYellow,
+  },
+  addAppointment: {
+    margin: 10,
+    marginBottom: 15,
+    padding: 5,
+    backgroundColor: pawGreen,
+    borderRadius: 25,
+    overflow: 'hidden',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  appointmentButton: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGrey,
+    textTransform: 'uppercase',
+  },
+  vaccineText: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawYellow,
+  },
+  activeVaccine: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGreen,
+  },
+  expiredVaccine: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: '#d94545',
   },
   /* account styles */
   profileBorder: {
@@ -411,12 +460,20 @@ export default StyleSheet.create({
     fontSize: 24,
     width: (Dimensions.get('window').width - 120),
     fontWeight: '600',
+    textAlign: 'center',
     textTransform: 'uppercase',
     letterSpacing: 1,
     fontFamily: 'QuicksandBold',
     color: pawYellow,
     flexBasis: 'auto',
     paddingRight: 10,
+  },
+  confirmButton: {
+    fontFamily: 'QuicksandBold',
+    color: pawGrey,
+  },
+  alertBackground: {
+    backgroundColor: pawLightGrey,
   },
   settingsItemOnboard: {
     alignSelf: 'center',

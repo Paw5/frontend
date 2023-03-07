@@ -19,12 +19,15 @@ import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datep
 import lstyles, {
   pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
-import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
+import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
 import AccountCard from '../components/AccountCard';
 import { reload } from '../redux/SettingsSlice';
-import Breeds from '../constants/breedList.json';
+import dogBreeds from '../constants/dogBreeds.json';
+import catBreeds from '../constants/catBreeds.json';
 
-const breedList = Breeds.breeds;
+const dBreeds = dogBreeds.breeds;
+const cBreeds = catBreeds.breeds;
+const emptyList = [];
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
@@ -43,7 +46,9 @@ export default function AccountTab() {
   }, [isDarkMode]);
 
   const [selectedItem, setSelectedItem] = useState('Select Breed');
-  const [itemList] = useState(breedList);
+  const [animalValue, setAnimalValue] = useState('Select Animal');
+  // const [animal, setAnimal] = useState(emptyList);
+  const [itemList, setAnimal] = useState(emptyList);
 
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
 
@@ -61,7 +66,7 @@ export default function AccountTab() {
     setPetsVisible(!isPetsVisible);
   };
 
-  /* toggle pet section modal */
+  /* toggle add pet section modal */
   const [isAddVisible, setAddVisible] = useState(false);
   const toggleAdd = () => {
     setAddVisible(!isAddVisible);
@@ -339,7 +344,7 @@ export default function AccountTab() {
               <Feather
                 name="plus-circle"
                 size={30}
-                color="indianred"
+                color={isDarkMode === 'light' ? pawGreen : pawPink}
                 style={{ marginRight: -5 }}
               />
             </Pressable>
@@ -366,7 +371,7 @@ export default function AccountTab() {
                     <Feather
                       name="chevron-left"
                       size={30}
-                      color={pawGrey}
+                      color={isDarkMode === 'light' ? pawYellow : pawPink}
                       style={styles.exitButton}
                     />
 
@@ -406,9 +411,51 @@ export default function AccountTab() {
                         autoCapitalize="words"
                         placeholder="Name"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                       />
                     </Pressable>
+
+                    <Collapsible
+                      style={styles.breedBubble}
+                      touchableComponent
+                      noArrow
+                      title={(
+                        <View>
+                          <Text
+                            style={styles.breedHeader}
+                          >
+                            Animal
+                          </Text>
+                          <Text
+                            style={styles.breedSelection}
+                          >
+                            {animalValue}
+                          </Text>
+                        </View>
+                    )}
+                    >
+                      <TouchableHighlight>
+                        <Picker
+                          style={styles.dropdown}
+                          itemStyle={styles.dropdown}
+                          selectedValue={animalValue}
+                          onValueChange={
+                            (itemValue) => {
+                              setAnimalValue(itemValue);
+                              setSelectedItem('Select Breed');
+                              if (itemValue === 'dog') {
+                                setAnimal(dBreeds);
+                              } else if (itemValue === 'cat') {
+                                setAnimal(cBreeds);
+                              }
+                            }
+}
+                        >
+                          <PickerItem label="DOG" value="dog" key="dog" />
+                          <PickerItem label="CAT" value="cat" key="cat" />
+                        </Picker>
+                      </TouchableHighlight>
+                    </Collapsible>
 
                     <Pressable
                       style={[styles.breedBubble, { width: Dimensions.get('window').width - 40 }]}
@@ -443,11 +490,6 @@ export default function AccountTab() {
                             setSelectedDate(getFormatedDate(date, 'MM/DD/YYYY'));
                           }}
                         />
-                        <Pressable>
-                          <Text>
-                            Close
-                          </Text>
-                        </Pressable>
                       </Modal>
                     </Pressable>
 
@@ -514,7 +556,9 @@ export default function AccountTab() {
                           inputMode="number"
                           placeholder="Weight"
                           placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                          style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                          style={[styles.menuText, {
+                            fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+                          }]}
                         />
                         <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                           lbs
@@ -535,7 +579,7 @@ export default function AccountTab() {
                         inputMode="number"
                         placeholder="ID Number"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                       />
                     </Pressable>
 

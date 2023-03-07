@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import lstyles, {
-  pawGreen, pawPink, pawGrey,
+  pawGreen, pawPink,
 } from '../constants/Styles';
 import dstyles, {
   pawYellow,

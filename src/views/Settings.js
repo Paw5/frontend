@@ -172,7 +172,7 @@ export default function ServicesTab() {
               name="chevron-left"
               size={30}
               color={isDarkMode === 'light' ? pawYellow : pawPink}
-              style={styles.settingsExitButton}
+              style={styles.exitButton}
             />
 
           </Pressable>
@@ -297,7 +297,7 @@ export default function ServicesTab() {
               name="chevron-left"
               size={30}
               color={isDarkMode === 'light' ? pawYellow : pawPink}
-              style={styles.settingsExitButton}
+              style={styles.exitButton}
             />
 
           </Pressable>

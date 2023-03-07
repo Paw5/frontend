@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
-import lstyles, { pawPink, pawGrey, pawWhite } from '../constants/Styles';
+import lstyles, { pawPink, pawGrey } from '../constants/Styles';
 import dstyles, {
   pawYellow,
 } from '../constants/DarkStyles';

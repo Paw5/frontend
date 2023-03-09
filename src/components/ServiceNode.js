@@ -8,6 +8,7 @@ import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
+const star = require('../../assets/paw5_icons/star_line.png');
 
 export default function ServNode() {
   const [styles, setStyles] = useState(lstyles);
@@ -42,36 +43,29 @@ export default function ServNode() {
         </View>
         <Text style={styles.servHeader}>Location Name</Text>
         <Text style={styles.servHeader2}>Service Type</Text>
-        <Feather
-          name="star"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={styles.servStar1}
+        <Image
+          style={[styles.servStar1, { height: 35, width: 35, tintColor: pawGrey }]}
+          source={star}
         />
-        <Feather
-          name="star"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={styles.servStar2}
+        <Image
+          style={[styles.servStar2, { height: 35, width: 35, tintColor: pawGrey }]}
+          source={star}
         />
-        <Feather
-          name="star"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={styles.servStar3}
+        <Image
+          style={[styles.servStar3, { height: 35, width: 35, tintColor: pawGrey }]}
+          source={star}
         />
-        <Feather
-          name="star"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={styles.servStar4}
+        <Image
+          style={[styles.servStar4, { height: 35, width: 35, tintColor: pawGrey }]}
+          source={star}
         />
-        <Feather
-          name="star"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={styles.servStar5}
+        <Image
+          style={[styles.servStar5, {
+            height: 35, width: 35, tintColor: pawGrey,
+          }]}
+          source={star}
         />
+
         <View
           style={styles.servicesLine}
         />

@@ -15,6 +15,8 @@ import ProfilePhotoCard from '../components/ProfilePhotoCard';
 import ProfilePostCard from '../components/ProfilePostCard';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
+const imageIcon = require('../../assets/paw5_icons/camera.png');
+const textIcon = require('../../assets/paw5_icons/text.png');
 
 export default function CommunityTab(bioUpdate) {
   const [styles, setStyles] = useState(lstyles);
@@ -120,23 +122,19 @@ export default function CommunityTab(bioUpdate) {
           </View>
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}>
             <Pressable onPress={toggleNewText}>
-              <Feather
-                name="file-plus"
-                size={30}
-                color={pawWhite}
+              <Image
                 style={[styles.settingsExitButton, {
-                  backgroundColor: pawGrey, marginRight: 50, marginTop: 40,
+                  height: 60, width: 60, backgroundColor: pawGrey, marginRight: 50, marginTop: 40, tintColor: pawWhite,
                 }]}
+                source={textIcon}
               />
             </Pressable>
             <Pressable onPress={toggleNewImage}>
-              <Feather
-                name="camera"
-                size={30}
-                color={pawWhite}
+              <Image
                 style={[styles.settingsExitButton, {
-                  backgroundColor: pawGrey, marginLeft: 50, marginTop: 40,
+                  height: 60, width: 60, backgroundColor: pawGrey, marginLeft: 40, marginTop: 40, tintColor: pawWhite,
                 }]}
+                source={imageIcon}
               />
             </Pressable>
           </View>
@@ -144,7 +142,7 @@ export default function CommunityTab(bioUpdate) {
             <Text style={[styles.filterText, { textAlign: 'center', marginRight: 35 }]}>
               Text Post
             </Text>
-            <Text style={[styles.filterText, { textAlign: 'center', marginLeft: 35 }]}>
+            <Text style={[styles.filterText, { textAlign: 'center', marginLeft: 50 }]}>
               Image Post
             </Text>
           </View>

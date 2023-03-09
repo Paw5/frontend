@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  View, TouchableOpacity, Dimensions, Animated, Pressable, Platform,
+  View, TouchableOpacity, Dimensions, Animated, Pressable, Platform, Image,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import Modal from 'react-native-modal';
@@ -25,6 +25,12 @@ import PawPosts from '../views/PawPosts';
 import PMs from '../views/PMs';
 import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
+
+const mapPin = require('../../assets/paw5_icons/map_pin.png');
+const servicesIcon = require('../../assets/paw5_icons/services.png');
+const newsIcon = require('../../assets/paw5_icons/news.png');
+const socialIcon = require('../../assets/paw5_icons/pen.png');
+const healthIcon = require('../../assets/paw5_icons/health-1.png');
 
 function MyTabBar({
   state, descriptors, navigation,
@@ -128,22 +134,17 @@ function MyTabBar({
               top: 20, bottom: 20, left: 20, right: 20,
             }}
           >
-            <Feather
-              name={
-                {
-                  N: isFocused ? 'book-open' : 'book',
-                  M: 'map-pin',
-                  S: 'compass',
-                  C: 'users',
-                  H: 'activity',
-                }[label] || 'home'
-              }
-              size={
-                currentScreen === label ? 50 : 30
-              }
-              color={isDarkMode === 'light' ? pawYellow : pawGrey}
-              style={{ justifyContent: 'center' }}
+            <Image
+              style={{ height: 70, width: 70, tintColor: pawGrey }}
+              source={{
+                N: newsIcon,
+                M: mapPin,
+                S: servicesIcon,
+                C: socialIcon,
+                H: healthIcon,
+              }[label] || 'home'}
             />
+
           </TouchableOpacity>
         );
       })}

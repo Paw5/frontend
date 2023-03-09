@@ -1,11 +1,12 @@
 import {
-  Text, Pressable, View,
+  Text, Pressable, View, Image,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Feather } from '@expo/vector-icons';
 import lstyles, { pawGrey } from '../constants/Styles';
-import dstyles, { pawYellow } from '../constants/DarkStyles';
+import dstyles from '../constants/DarkStyles';
+
+const arrowRightIcon = require('../../assets/paw5_icons/arrow-r.png');
 
 export default function EventTab() {
   const [styles, setStyles] = useState(lstyles);
@@ -39,11 +40,11 @@ export default function EventTab() {
           mollit anim id est laborum.
         </Text>
 
-        <Feather
-          name="arrow-right-circle"
-          size={30}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={{ alignSelf: 'center' }}
+        <Image
+          style={{
+            height: 45, width: 35, tintColor: pawGrey, alignSelf: 'center',
+          }}
+          source={arrowRightIcon}
         />
       </View>
     </Pressable>

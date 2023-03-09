@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  TextInput, View, Text, Pressable, KeyboardAvoidingView,
+  TextInput, View, Text, Pressable, KeyboardAvoidingView, Image,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
+
+const filterIcon = require('../../assets/paw5_icons/filters.png');
 
 export default function SearchBar(searchQuery) {
   const [styles, setStyles] = useState(lstyles);
@@ -64,11 +66,9 @@ export default function SearchBar(searchQuery) {
       </KeyboardAvoidingView>
 
       <Pressable style={styles.filters} onPress={() => setModalVisible(true)}>
-        <Feather
-          name="filter"
-          size={20}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={{ justifyContent: 'center', alignSelf: 'center' }}
+        <Image
+          style={{ height: 35, width: 35, tintColor: pawGrey }}
+          source={filterIcon}
         />
       </Pressable>
     </View>

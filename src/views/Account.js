@@ -56,13 +56,9 @@ export default function AccountTab() {
   };
 
   const addPetToDB = async () => {
-    console.log(formEntry);
     const networkResponse = await _.post('pets/2039', formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
-
-      console.log('success');
-
       return (
         <AwesomeAlert
           show={petAdded}
@@ -79,6 +75,13 @@ export default function AccountTab() {
       );
     });
   };
+
+  // const getPets = async () => {
+  //   const networkResponse = await _.get('pets/2039');
+  //   networkResponse.onSuccess(() => {
+  //     console.log(networkResponse);
+  //   });
+  // };
 
   const updateFormEntry = (key, value) => {
     const newFormEntry = formEntry;
@@ -550,10 +553,10 @@ export default function AccountTab() {
                           </Text>
                           <TextInput
                             style={styles.breedSelection}
+                            defaultValue={selectedItem}
                             placeholder={selectedItem}
                             placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                             onChangeText={(value) => {
-                              console.log(value);
                               setAutofillText(value);
                             }}
                           />

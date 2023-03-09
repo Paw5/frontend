@@ -51,7 +51,8 @@ export default function AccountTab() {
   }, [isDarkMode]);
 
   const addPetToDB = async () => {
-    const networkResponse = await _.post('pets/180', formEntry);
+    console.log(formEntry);
+    const networkResponse = await _.post('pets/2039', formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
     });

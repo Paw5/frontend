@@ -50,11 +50,33 @@ export default function AccountTab() {
     else setStyles(lstyles);
   }, [isDarkMode]);
 
+  const [petAdded, showPetAdded] = useState(false);
+  const toggleAddSuccess = () => {
+    showPetAdded(!petAdded);
+  };
+
   const addPetToDB = async () => {
     console.log(formEntry);
     const networkResponse = await _.post('pets/2039', formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
+
+      console.log('success');
+
+      return (
+        <AwesomeAlert
+          show={petAdded}
+          title="Pet Added!"
+          confirmText="Yay!"
+          titleStyle={styles.settingsText}
+          contentContainerStyle={styles.alertBackground}
+          showConfirmButton
+          confirmButtonTextStyle={styles.confirmButton}
+          onConfirmPressed={toggleAddSuccess}
+          style={{ borderRadius: 50, overflow: 'hidden' }}
+          confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+        />
+      );
     });
   };
 
@@ -67,6 +89,7 @@ export default function AccountTab() {
   const [selectedItem, setSelectedItem] = useState('Select Breed');
   const [animalValue, setAnimalValue] = useState('Select Animal');
   const [itemList, setAnimal] = useState(emptyList);
+  const [autofillText, setAutofillText] = useState('');
 
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
 
@@ -525,11 +548,15 @@ export default function AccountTab() {
                           >
                             Breed
                           </Text>
-                          <Text
+                          <TextInput
                             style={styles.breedSelection}
-                          >
-                            {selectedItem}
-                          </Text>
+                            placeholder={selectedItem}
+                            placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                            onChangeText={(value) => {
+                              console.log(value);
+                              setAutofillText(value);
+                            }}
+                          />
                         </View>
                     )}
                     >
@@ -543,7 +570,7 @@ export default function AccountTab() {
                             updateFormEntry('breed', index);
                           }}
                         >
-                          {itemList.map((value) => (
+                          {itemList.filter((value) => value.includes(autofillText)).map((value) => (
                             <PickerItem label={value} value={value} key={value} />
                           ))}
                         </Picker>

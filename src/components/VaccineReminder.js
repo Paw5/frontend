@@ -45,17 +45,6 @@ export default function PetCard() {
           </View>
         </Pressable>
 
-        <Pressable onPress={toggleStatus}>
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.appointmentText}>
-              Miso
-            </Text>
-            <Text style={styles.appointmentText}>
-              Status
-            </Text>
-          </View>
-        </Pressable>
-
         <Modal
           isVisible={isStatusVisible}
           animationIn="slideInRight"

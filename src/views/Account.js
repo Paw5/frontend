@@ -51,28 +51,19 @@ export default function AccountTab() {
   }, [isDarkMode]);
 
   const [petAdded, showPetAdded] = useState(false);
-  const toggleAddSuccess = () => {
+  const toggleSuccess = () => {
     showPetAdded(!petAdded);
+  };
+
+  const [profileEdited, showProfileEdited] = useState(false);
+  const toggleProfileSuccess = () => {
+    showProfileEdited(!profileEdited);
   };
 
   const addPetToDB = async () => {
     const networkResponse = await _.post('pets/2039', formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
-      return (
-        <AwesomeAlert
-          show={petAdded}
-          title="Pet Added!"
-          confirmText="Yay!"
-          titleStyle={styles.settingsText}
-          contentContainerStyle={styles.alertBackground}
-          showConfirmButton
-          confirmButtonTextStyle={styles.confirmButton}
-          onConfirmPressed={toggleAddSuccess}
-          style={{ borderRadius: 50, overflow: 'hidden' }}
-          confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
-        />
-      );
     });
   };
 
@@ -120,6 +111,16 @@ export default function AccountTab() {
   const [isDateVisible, setDateVisible] = useState(false);
   const toggleDate = () => {
     setDateVisible(!isDateVisible);
+  };
+
+  const closeAll = () => {
+    showPetAdded(false);
+    setAddVisible(false);
+  };
+
+  const closeProfile = () => {
+    showProfileEdited(false);
+    setProfileVisible(false);
   };
 
   const [loggingOut, setLoggingOut] = useState(false);
@@ -191,7 +192,7 @@ export default function AccountTab() {
               name="chevron-left"
               size={30}
               color={isDarkMode === 'light' ? pawYellow : pawPink}
-              style={styles.exitButton}
+              style={[styles.exitButton, { marginBottom: -35 }]}
             />
 
           </Pressable>
@@ -291,6 +292,30 @@ export default function AccountTab() {
               Location Data
             </Text>
           </Pressable>
+
+          <Pressable
+            style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+            onPress={toggleProfileSuccess}
+          >
+            <Text
+              style={styles.submittext}
+            >
+              Submit
+            </Text>
+          </Pressable>
+
+          <AwesomeAlert
+            show={profileEdited}
+            title="Profile Updated!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeProfile}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
         </View>
       </Modal>
 
@@ -642,7 +667,10 @@ export default function AccountTab() {
 
                     <Pressable
                       style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
-                      onPress={addPetToDB}
+                      onPress={() => {
+                        addPetToDB();
+                        toggleSuccess();
+                      }}
                     >
                       <Text
                         style={styles.submittext}
@@ -650,6 +678,19 @@ export default function AccountTab() {
                         Submit
                       </Text>
                     </Pressable>
+
+                    <AwesomeAlert
+                      show={petAdded}
+                      title="Pet Added!"
+                      confirmText="Yay!"
+                      titleStyle={styles.alertText}
+                      contentContainerStyle={styles.alertBackground}
+                      showConfirmButton
+                      confirmButtonTextStyle={styles.confirmButton}
+                      onConfirmPressed={closeAll}
+                      style={{ borderRadius: 50, overflow: 'hidden' }}
+                      confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                    />
                   </ScrollView>
                 </View>
               </KeyboardAwareScrollView>
@@ -678,7 +719,7 @@ export default function AccountTab() {
         title="See you next time!"
         progressColor="#69a297"
         progressSize="large"
-        titleStyle={styles.settingsText}
+        titleStyle={styles.alertText}
       />
     </View>
   );

@@ -52,7 +52,6 @@ export default function Onboarding({ setViewedOnboard }) {
         dispatch(reload());
       });
     }).onClientError((response) => {
-      console.error(response);
       if (response.status === 401) dropdownAlert.alertWithType('custom', 'Error', 'That username or password is invalid.');
       else dropdownAlert.alertWithType('custom', 'Error', 'An unexpected error occurred.');
     });

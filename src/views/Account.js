@@ -16,6 +16,7 @@ import { Picker } from '@react-native-picker/picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Collapsible from '@eliav2/react-native-collapsible-view';
 import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
+import Network from '../util/Network';
 import lstyles, {
   pawPink, pawGrey, pawWhite,
 } from '../constants/Styles';
@@ -35,20 +36,54 @@ const PickerItem = Picker.Item;
 
 const StatusBarHeight = getStatusBarHeight();
 
+const _ = Network();
+
 export default function AccountTab() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const dispatch = useDispatch();
+
+  const [formEntry, setFormEntry] = useState({});
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);
   }, [isDarkMode]);
 
+  const [petAdded, showPetAdded] = useState(false);
+  const toggleSuccess = () => {
+    showPetAdded(!petAdded);
+  };
+
+  const [profileEdited, showProfileEdited] = useState(false);
+  const toggleProfileSuccess = () => {
+    showProfileEdited(!profileEdited);
+  };
+
+  const addPetToDB = async () => {
+    const networkResponse = await _.post('pets/2039', formEntry);
+    networkResponse.onSuccess(() => {
+      setFormEntry({});
+    });
+  };
+
+  // const getPets = async () => {
+  //   const networkResponse = await _.get('pets/2039');
+  //   networkResponse.onSuccess(() => {
+  //     console.log(networkResponse);
+  //   });
+  // };
+
+  const updateFormEntry = (key, value) => {
+    const newFormEntry = formEntry;
+    newFormEntry[key] = value;
+    setFormEntry(newFormEntry);
+  };
+
   const [selectedItem, setSelectedItem] = useState('Select Breed');
   const [animalValue, setAnimalValue] = useState('Select Animal');
-  // const [animal, setAnimal] = useState(emptyList);
   const [itemList, setAnimal] = useState(emptyList);
+  const [autofillText, setAutofillText] = useState('');
 
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
 
@@ -76,6 +111,16 @@ export default function AccountTab() {
   const [isDateVisible, setDateVisible] = useState(false);
   const toggleDate = () => {
     setDateVisible(!isDateVisible);
+  };
+
+  const closeAll = () => {
+    showPetAdded(false);
+    setAddVisible(false);
+  };
+
+  const closeProfile = () => {
+    showProfileEdited(false);
+    setProfileVisible(false);
   };
 
   const [loggingOut, setLoggingOut] = useState(false);
@@ -147,7 +192,7 @@ export default function AccountTab() {
               name="chevron-left"
               size={30}
               color={isDarkMode === 'light' ? pawYellow : pawPink}
-              style={styles.exitButton}
+              style={[styles.exitButton, { marginBottom: -35 }]}
             />
 
           </Pressable>
@@ -247,6 +292,30 @@ export default function AccountTab() {
               Location Data
             </Text>
           </Pressable>
+
+          <Pressable
+            style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+            onPress={toggleProfileSuccess}
+          >
+            <Text
+              style={styles.submittext}
+            >
+              Submit
+            </Text>
+          </Pressable>
+
+          <AwesomeAlert
+            show={profileEdited}
+            title="Profile Updated!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeProfile}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
         </View>
       </Modal>
 
@@ -412,6 +481,7 @@ export default function AccountTab() {
                         placeholder="Name"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                        onChangeText={(text) => updateFormEntry('pet_name', text)}
                       />
                     </Pressable>
 
@@ -443,13 +513,14 @@ export default function AccountTab() {
                             (itemValue) => {
                               setAnimalValue(itemValue);
                               setSelectedItem('Select Breed');
+                              updateFormEntry('type', itemValue);
                               if (itemValue === 'dog') {
                                 setAnimal(dBreeds);
                               } else if (itemValue === 'cat') {
                                 setAnimal(cBreeds);
                               }
                             }
-}
+                          }
                         >
                           <PickerItem label="DOG" value="dog" key="dog" />
                           <PickerItem label="CAT" value="cat" key="cat" />
@@ -488,6 +559,7 @@ export default function AccountTab() {
                           mode="calendar"
                           onSelectedChange={(date) => {
                             setSelectedDate(getFormatedDate(date, 'MM/DD/YYYY'));
+                            updateFormEntry('custom_info', date);
                           }}
                         />
                       </Modal>
@@ -504,11 +576,15 @@ export default function AccountTab() {
                           >
                             Breed
                           </Text>
-                          <Text
+                          <TextInput
                             style={styles.breedSelection}
-                          >
-                            {selectedItem}
-                          </Text>
+                            defaultValue={selectedItem}
+                            placeholder={selectedItem}
+                            placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                            onChangeText={(value) => {
+                              setAutofillText(value);
+                            }}
+                          />
                         </View>
                     )}
                     >
@@ -517,9 +593,12 @@ export default function AccountTab() {
                           style={styles.dropdown}
                           itemStyle={styles.dropdown}
                           selectedValue={selectedItem}
-                          onValueChange={(index) => setSelectedItem(index)}
+                          onValueChange={(index) => {
+                            setSelectedItem(index);
+                            updateFormEntry('breed', index);
+                          }}
                         >
-                          {itemList.map((value) => (
+                          {itemList.filter((value) => value.includes(autofillText)).map((value) => (
                             <PickerItem label={value} value={value} key={value} />
                           ))}
                         </Picker>
@@ -539,6 +618,7 @@ export default function AccountTab() {
                         placeholder="Color"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                        onChangeText={(text) => updateFormEntry('fur_color', text)}
                       />
                     </Pressable>
 
@@ -559,6 +639,7 @@ export default function AccountTab() {
                           style={[styles.menuText, {
                             fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
                           }]}
+                          onChangeText={(text) => updateFormEntry('weight', text)}
                         />
                         <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                           lbs
@@ -580,16 +661,36 @@ export default function AccountTab() {
                         placeholder="ID Number"
                         placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                         style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                        onChangeText={(text) => updateFormEntry('microchip', text)}
                       />
                     </Pressable>
 
-                    <Pressable style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}>
+                    <Pressable
+                      style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                      onPress={() => {
+                        addPetToDB();
+                        toggleSuccess();
+                      }}
+                    >
                       <Text
                         style={styles.submittext}
                       >
                         Submit
                       </Text>
                     </Pressable>
+
+                    <AwesomeAlert
+                      show={petAdded}
+                      title="Pet Added!"
+                      confirmText="Yay!"
+                      titleStyle={styles.alertText}
+                      contentContainerStyle={styles.alertBackground}
+                      showConfirmButton
+                      confirmButtonTextStyle={styles.confirmButton}
+                      onConfirmPressed={closeAll}
+                      style={{ borderRadius: 50, overflow: 'hidden' }}
+                      confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                    />
                   </ScrollView>
                 </View>
               </KeyboardAwareScrollView>
@@ -618,7 +719,7 @@ export default function AccountTab() {
         title="See you next time!"
         progressColor="#69a297"
         progressSize="large"
-        titleStyle={styles.settingsText}
+        titleStyle={styles.alertText}
       />
     </View>
   );

@@ -104,6 +104,11 @@ export default function UpcomingAppointments() {
     setDateVisible(!isDateVisible);
   };
 
+  const closeAll = () => {
+    showEventAdded(false);
+    setAddVisible(false);
+  };
+
   const [selectedDate, setSelectedDate] = useState(dateFormat(new Date(), 'mm/dd/yyyy\nh:MM tt'));
 
   return (
@@ -233,6 +238,7 @@ export default function UpcomingAppointments() {
                 >
                   <DatePicker
                     options={styles.datePicker}
+                    minimumDate={getToday()}
                     style={styles.dateContainer}
                     current={getToday()}
                     selected={getToday()}
@@ -262,11 +268,11 @@ export default function UpcomingAppointments() {
                 show={eventAdded}
                 title="Event Added!"
                 confirmText="Yay!"
-                titleStyle={styles.settingsText}
+                titleStyle={styles.alertText}
                 contentContainerStyle={styles.alertBackground}
                 showConfirmButton
                 confirmButtonTextStyle={styles.confirmButton}
-                onConfirmPressed={toggleSuccess}
+                onConfirmPressed={closeAll}
                 style={{ borderRadius: 50, overflow: 'hidden' }}
                 confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
               />

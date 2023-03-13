@@ -47,7 +47,7 @@ export default function Onboarding({ setViewedOnboard }) {
       },
     });
     networkResponse.onSuccess((response) => {
-      AsyncStorage.setItem('@loginToken', response.data.token, () => {
+      AsyncStorage.setItem('@loginToken', response.data.access_token, () => {
         setViewedOnboard(true);
         dispatch(reload());
       });
@@ -60,7 +60,7 @@ export default function Onboarding({ setViewedOnboard }) {
   const registerUser = async () => {
     const networkResponse = await _.post('login', formEntry);
     networkResponse.onSuccess((response) => {
-      AsyncStorage.setItem('@loginToken', response.data.token);
+      AsyncStorage.setItem('@loginToken', response.data.access_token);
       setRegisterVisible(false);
       setViewedOnboard(true);
       setFormEntry({});

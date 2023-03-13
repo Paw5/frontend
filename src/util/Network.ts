@@ -25,12 +25,13 @@ class Network {
       host,
       options: {
         headers: {
-          Authorization: loginToken ? `Bearer ${loginToken}` : undefined,
+          authorization: loginToken ? `Bearer ${loginToken}` : undefined,
           ...options && options.headers,
         },
         ...options,
       },
     };
+    if (!loginToken) delete this.request.options.headers.authorization;
     try {
       const response = await axios.get(API_ENDPOINT + host, this.request.options);
       this.response = new NetworkResponse(response);
@@ -51,13 +52,14 @@ class Network {
       host,
       options: {
         headers: {
-          Authorization: loginToken ? `Bearer ${loginToken}` : undefined,
+          authorization: loginToken ? `Bearer ${loginToken}` : undefined,
           ...options && options.headers,
         },
         ...options,
       },
       body
     };
+    if (!loginToken) delete this.request.options.headers.authorization;
     try {
       const response = await axios.post(API_ENDPOINT + host, body, this.request.options);
       this.response = new NetworkResponse(response);

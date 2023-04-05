@@ -8,9 +8,10 @@ import dstyles from '../constants/DarkStyles';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
-export default function PetCard() {
+export default function PetCard({ pet }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
+  const { pet_name: petName } = pet;
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -25,7 +26,7 @@ export default function PetCard() {
           style={styles.petImage}
           source={miso}
         />
-        <Text style={styles.petHeader}>Miso</Text>
+        <Text style={styles.petHeader}>{petName}</Text>
 
       </Pressable>
     </View>

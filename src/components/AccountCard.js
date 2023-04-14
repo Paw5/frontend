@@ -10,15 +10,16 @@ import { useSelector } from 'react-redux';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import { Feather } from '@expo/vector-icons';
 import lstyles, {
-  pawPink, pawGrey, pawWhite,
+  pawPink, pawWhite,
 } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
-export default function AccountCard() {
+export default function AccountCard({ pet }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
+  const { pet_name: petName, fur_color: furColor, microchip: chipNumber } = pet;
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -51,9 +52,11 @@ export default function AccountCard() {
         />
         <View style={styles.accountHeaderView}>
           <Text
+            numberOfLines
+            adjustsFontSizeToFit
             style={styles.accountHeader}
           >
-            Miso
+            {petName}
           </Text>
           <Pressable>
             <Feather
@@ -121,7 +124,7 @@ export default function AccountCard() {
                     numberOfLines={1}
                     style={[styles.menuText, styles.usernameFont]}
                   >
-                    Miso
+                    {petName}
                   </Text>
                 </View>
 
@@ -135,8 +138,7 @@ export default function AccountCard() {
                     autoCorrect={false}
                     clearTextOnFocus
                     autoCapitalize="words"
-                    placeholder="Color"
-                    placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                    defaultValue={furColor}
                     style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                   />
                 </Pressable>
@@ -151,10 +153,7 @@ export default function AccountCard() {
                     <TextInput
                       autoCorrect={false}
                       clearTextOnFocus
-                      keyboardType="decimal-pad"
-                      inputMode="number"
-                      placeholder="Weight"
-                      placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                      defaultValue={pet.weight.toString()}
                       style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
                     />
                     <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
@@ -174,8 +173,7 @@ export default function AccountCard() {
                     clearTextOnFocus
                     keyboardType="number-pad"
                     inputMode="number"
-                    placeholder="ID Number"
-                    placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                    defaultValue={chipNumber}
                     style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
                   />
                 </Pressable>

@@ -1,9 +1,10 @@
 import {
-  View, Dimensions, Animated, ScrollView,
+  View, Dimensions, Animated, ScrollView, Pressable, Text,
 } from 'react-native';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
+import { Feather } from '@expo/vector-icons';
 import lstyles, { pawPink, pawWhite } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow } from '../constants/DarkStyles';
 import PetCard from '../components/PetCard';
@@ -23,8 +24,8 @@ export default function HealthTab() {
   const [petCards, setPetCards] = useState(() => []);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const [userId, setUserId] = useState(0);
-  
-  if(!userId) {
+
+  if (!userId) {
     _.get('login').then((response) => {
       response.onSuccess((results) => {
         setUserId(results.data.user_id);
@@ -38,7 +39,7 @@ export default function HealthTab() {
   }, [isDarkMode]);
 
   const scrollX = new Animated.Value(0);
-  
+
   if (userId && !petCards.length && !hasLoadedPets) {
     _.get('pets', {
       params: {
@@ -46,6 +47,7 @@ export default function HealthTab() {
       },
     }).then((results) => {
       const pets = results.data().results;
+
       setPetCards(pets);
       setHasLoadedPets(true);
     });
@@ -82,23 +84,38 @@ export default function HealthTab() {
             marginLeft: 10,
           }}
         >
+          {/* eslint-disable-next-line react/no-array-index-key */}
           { petCards.map((pet, index) => <PetCard pet={pet} key={`pet-card-${index}`} />) }
+
+          <View style={styles.transparentBG}>
+            <Pressable style={styles.petCard}>
+              <Feather
+                name="plus-circle"
+                size={80}
+                color={pawPink}
+                style={{ marginRight: -5, marginBottom: 25 }}
+              />
+              <Text style={styles.petHeader}>Add Pet</Text>
+
+            </Pressable>
+          </View>
         </Animated.ScrollView>
-        { petCards.length ?
-        <View style={styles.scrollIndicator}>
-          <RNAnimatedScrollIndicators
-            numberOfCards={petCards.length}
-            scrollWidth={Dimensions.get('window').width}
-            activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
-            inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
-            scrollAnimatedValue={scrollX}
-            style={{
-              alignSelf: 'center',
-              justifyContent: 'center',
-            }}
-          />
-        </View> : <View /> // <-- No pets found element
-        }
+        { petCards.length
+          ? (
+            <View style={styles.scrollIndicator}>
+              <RNAnimatedScrollIndicators
+                numberOfCards={petCards.length}
+                scrollWidth={Dimensions.get('window').width}
+                activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
+                inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
+                scrollAnimatedValue={scrollX}
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}
+              />
+            </View>
+          ) : <View /> }
 
         <Reminders />
         <UpcomingAppointments />

@@ -9,6 +9,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import dateFormat from 'dateformat';
 import * as Calendar from 'expo-calendar';
 import lstyles, {
@@ -28,18 +29,25 @@ async function createCalendar() {
   const defaultCalendarSource = Platform.OS === 'ios'
     ? await getDefaultCalendarSource()
     : { isLocalAccount: true, name: 'Paw5' };
-  const newCalendarID = await Calendar.createCalendarAsync({
-    title: 'Paw5',
-    color: '#69a297',
-    entityType: Calendar.EntityTypes.EVENT,
-    sourceId: defaultCalendarSource.id,
-    source: defaultCalendarSource,
-    name: 'internalCalendarName',
-    ownerAccount: 'personal',
-    accessLevel: Calendar.CalendarAccessLevel.OWNER,
-  });
 
-  newID = newCalendarID;
+  const existingCalendar = await AsyncStorage.getItem('@calendarID');
+
+  if (typeof (calendarExists) !== 'object') {
+    newID = existingCalendar;
+  } else {
+    const newCalendarID = await Calendar.createCalendarAsync({
+      title: 'Paw5',
+      color: '#69a297',
+      entityType: Calendar.EntityTypes.EVENT,
+      sourceId: defaultCalendarSource.id,
+      source: defaultCalendarSource,
+      name: 'internalCalendarName',
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    newID = newCalendarID;
+    AsyncStorage.setItem('@calendarID', newCalendarID);
+  }
 }
 
 export default function UpcomingAppointments() {

@@ -399,6 +399,8 @@ export default StyleSheet.create({
     color: pawYellow,
     flexBasis: 'auto',
     paddingLeft: 5,
+    width: 100,
+    overflow: 'hidden',
   },
   accountCard: {
     height: 200,

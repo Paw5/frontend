@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import {
   View, Text, Dimensions, Pressable, Image, Animated, TouchableWithoutFeedback,
-  ScrollView, Platform, TouchableHighlight, TextInput,
+  ScrollView, Platform, TouchableHighlight, TextInput, TouchableOpacity,
   Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
@@ -42,6 +42,15 @@ export default function AccountTab() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const dispatch = useDispatch();
+  const [userId, setUserId] = useState(0);
+
+  if (!userId) {
+    _.get('login').then((response) => {
+      response.onSuccess((results) => {
+        setUserId(results.data.user_id);
+      });
+    });
+  }
 
   const [formEntry, setFormEntry] = useState({});
 
@@ -61,18 +70,11 @@ export default function AccountTab() {
   };
 
   const addPetToDB = async () => {
-    const networkResponse = await _.post('pets/2039', formEntry);
+    const networkResponse = await _.post(`pets/${userId}`, formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
     });
   };
-
-  // const getPets = async () => {
-  //   const networkResponse = await _.get('pets/2039');
-  //   networkResponse.onSuccess(() => {
-  //     console.log(networkResponse);
-  //   });
-  // };
 
   const updateFormEntry = (key, value) => {
     const newFormEntry = formEntry;
@@ -84,10 +86,29 @@ export default function AccountTab() {
   const [animalValue, setAnimalValue] = useState('Select Animal');
   const [itemList, setAnimal] = useState(emptyList);
   const [autofillText, setAutofillText] = useState('');
+  const [petCards, setPetCards] = useState(() => []);
+  const [hasLoadedPets, setHasLoadedPets] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
 
   const scrollX = new Animated.Value(0);
+
+  if (userId && !petCards.length && !hasLoadedPets) {
+    _.get('pets', {
+      params: {
+        user_id: userId,
+      },
+    }).then((results) => {
+      const pets = results.data().results;
+
+      if (pets.length >= petCards.length) {
+        setPetCards(pets);
+        setHasLoadedPets(true);
+      } else {
+        setHasLoadedPets(false);
+      }
+    });
+  }
 
   /* toggle profile section modal */
   const [isProfileVisible, setProfileVisible] = useState(false);
@@ -381,26 +402,27 @@ export default function AccountTab() {
                 marginBottom: 20,
               }}
             >
-              <AccountCard />
-              <AccountCard />
-              <AccountCard />
-              <AccountCard />
+              {/* eslint-disable-next-line react/no-array-index-key */}
+              { petCards.map((pet, index) => <AccountCard pet={pet} key={`pet-card-${index}`} />) }
 
             </Animated.ScrollView>
 
-            <View style={styles.scrollIndicator}>
-              <RNAnimatedScrollIndicators
-                numberOfCards={4}
-                scrollWidth={Dimensions.get('window').width}
-                activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
-                inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
-                scrollAnimatedValue={scrollX}
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}
-              />
-            </View>
+            { petCards.length
+              ? (
+                <View style={styles.scrollIndicator}>
+                  <RNAnimatedScrollIndicators
+                    numberOfCards={petCards.length}
+                    scrollWidth={Dimensions.get('window').width}
+                    activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
+                    inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
+                    scrollAnimatedValue={scrollX}
+                    style={{
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                    }}
+                  />
+                </View>
+              ) : <View /> }
 
             <Pressable onPress={toggleAdd} style={[styles.menuItem, { marginTop: 20, width: Dimensions.get('window').width - 40 }]}>
               <Text
@@ -578,17 +600,17 @@ export default function AccountTab() {
                           </Text>
                           <TextInput
                             style={styles.breedSelection}
-                            defaultValue={selectedItem}
-                            placeholder={selectedItem}
                             placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                             onChangeText={(value) => {
                               setAutofillText(value);
                             }}
+                            defaultValue={selectedItem}
+                            clearTextOnFocus
                           />
                         </View>
                     )}
                     >
-                      <TouchableHighlight>
+                      <TouchableOpacity>
                         <Picker
                           style={styles.dropdown}
                           itemStyle={styles.dropdown}
@@ -599,10 +621,14 @@ export default function AccountTab() {
                           }}
                         >
                           {itemList.filter((value) => value.includes(autofillText)).map((value) => (
-                            <PickerItem label={value} value={value} key={value} />
+                            <PickerItem
+                              label={value}
+                              value={value}
+                              key={value}
+                            />
                           ))}
                         </Picker>
-                      </TouchableHighlight>
+                      </TouchableOpacity>
                     </Collapsible>
 
                     <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>

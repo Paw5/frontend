@@ -17,6 +17,21 @@ class Network {
 
   public static instance: Network;
 
+  postImage = async (host: string, body: {}, options: AxiosRequestConfig) => {
+    const fileEndingMatchArr = host.match(/\.(png|jpe?g)$/ig)
+    if (fileEndingMatchArr.length) {
+      const mimeType = fileEndingMatchArr[0] === '.png' ? 'image/png' : 'image/jpeg';
+      return this.post(host, body, {
+        ...options,
+        headers: {
+          ...options && options.headers,
+          'Content-Type': mimeType
+        }
+      });
+    }
+    return this.post(host, body, options);
+  }
+
 
   get = async (host: string, options: AxiosRequestConfig) => {
     const loginToken = await AsyncStorage.getItem('@loginToken');

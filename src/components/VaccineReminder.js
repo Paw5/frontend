@@ -40,6 +40,128 @@ export default function VaccineReminder({ pets }) {
     setCurrentPet(pet);
   };
 
+  // eslint-disable-next-line consistent-return
+  function displayVaccineList() {
+    if (currentPet) {
+      if (currentPet.type === 'dog') {
+        return (
+          <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Distemper
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Hepititus
+              </Text>
+              <Text style={styles.expiredVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Parvovirus
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Parainfluenza
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Rabies
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Leptospirosis
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+
+            <View style={styles.appointmentPiece}>
+              <Text style={styles.vaccineText}>
+                Bordetella
+              </Text>
+              <Text style={styles.activeVaccine}>
+                {dateFormat(new Date(), 'm/d/yy')}
+              </Text>
+            </View>
+          </Pressable>
+        );
+      }
+      return (
+        <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+          <View style={styles.appointmentPiece}>
+            <Text style={styles.vaccineText}>
+              Calicivirus
+            </Text>
+            <Text style={styles.expiredVaccine}>
+              {dateFormat(new Date(), 'm/d/yy')}
+            </Text>
+          </View>
+
+          <View style={styles.appointmentPiece}>
+            <Text style={styles.vaccineText}>
+              Feline Leukemia
+            </Text>
+            <Text style={styles.activeVaccine}>
+              {dateFormat(new Date(), 'm/d/yy')}
+            </Text>
+          </View>
+
+          <View style={styles.appointmentPiece}>
+            <Text style={styles.vaccineText}>
+              Rabies
+            </Text>
+            <Text style={styles.expiredVaccine}>
+              {dateFormat(new Date(), 'm/d/yy')}
+            </Text>
+          </View>
+
+          <View style={styles.appointmentPiece}>
+            <Text style={styles.vaccineText}>
+              Rhinotracheitis
+            </Text>
+            <Text style={styles.activeVaccine}>
+              {dateFormat(new Date(), 'm/d/yy')}
+            </Text>
+          </View>
+
+          <View style={styles.appointmentPiece}>
+            <Text style={styles.vaccineText}>
+              Panleukopenia
+            </Text>
+            <Text style={styles.activeVaccine}>
+              {dateFormat(new Date(), 'm/d/yy')}
+            </Text>
+          </View>
+        </Pressable>
+      );
+    }
+  }
+
   return (
 
     <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
@@ -97,120 +219,7 @@ export default function VaccineReminder({ pets }) {
                   />
                 </View>
 
-                { currentPet.type === 'dog'
-                  ? (
-                    <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Distemper
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Hepititus
-                        </Text>
-                        <Text style={styles.expiredVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Parvovirus
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Parainfluenza
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Rabies
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Leptospirosis
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Bordetella
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  ) : (
-                    <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Calicivirus
-                        </Text>
-                        <Text style={styles.expiredVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Feline Leukemia
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Rabies
-                        </Text>
-                        <Text style={styles.expiredVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Rhinotracheitis
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-
-                      <View style={styles.appointmentPiece}>
-                        <Text style={styles.vaccineText}>
-                          Panleukopenia
-                        </Text>
-                        <Text style={styles.activeVaccine}>
-                          {dateFormat(new Date(), 'm/d/yy')}
-                        </Text>
-                      </View>
-                    </Pressable>
-                  )}
+                {displayVaccineList()}
               </View>
             </KeyboardAwareScrollView>
           </TouchableWithoutFeedback>

@@ -11,6 +11,7 @@ export default function PetCard({ pet }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const { pet_name: petName } = pet;
+  console.log(petName);
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);

@@ -14,7 +14,15 @@ import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
 export default function VaccineReminder({ pets }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-  const [currentPet, setCurrentPet] = useState(pets[0]);
+  const [petList, setPetList] = useState([]);
+  const [currentPet, setCurrentPet] = useState();
+  const [arePetsLoaded, setPetsLoaded] = useState(false);
+
+  if (pets.length && !arePetsLoaded) {
+    setPetList(pets);
+    setPetsLoaded(true);
+    setCurrentPet(pets[0]);
+  }
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -27,6 +35,11 @@ export default function VaccineReminder({ pets }) {
     setStatusVisible(!isStatusVisible);
   };
 
+  const openStatus = (pet) => {
+    toggleStatus();
+    setCurrentPet(pet);
+  };
+
   return (
 
     <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
@@ -36,9 +49,9 @@ export default function VaccineReminder({ pets }) {
       />
       <View style={{ flex: 2 }}>
 
-        {pets.map((pet, index) => (
+        {petList.map((pet, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <Pressable onPress={toggleStatus} key={`pet-card-${index}`}>
+          <Pressable onPress={() => openStatus(pet)} id={pet} key={`pet-line-${index}`}>
             <View style={styles.appointmentPiece}>
               <Text style={styles.appointmentText}>
                 {pet.pet_name}
@@ -84,7 +97,7 @@ export default function VaccineReminder({ pets }) {
                   />
                 </View>
 
-                {/* { catDog === 'dog'
+                { currentPet.type === 'dog'
                   ? (
                     <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
                       <View style={styles.appointmentPiece}>
@@ -197,7 +210,7 @@ export default function VaccineReminder({ pets }) {
                         </Text>
                       </View>
                     </Pressable>
-                  )} */}
+                  )}
               </View>
             </KeyboardAwareScrollView>
           </TouchableWithoutFeedback>

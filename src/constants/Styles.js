@@ -254,6 +254,16 @@ export default StyleSheet.create({
     paddingLeft: 18,
     paddingRight: 20,
   },
+  servingSizeButton: {
+    padding: 18,
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
+  servingSizeText: {
+    color: pawWhite,
+    fontSize: 20,
+    fontFamily: 'QuicksandBold',
+  },
   usernameField: {
     marginBottom: 15,
     justifyContent: 'center',

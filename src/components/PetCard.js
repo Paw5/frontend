@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
+import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
 import { useSelector } from 'react-redux';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Collapsible from '@eliav2/react-native-collapsible-view';
@@ -38,7 +39,61 @@ export default function PetCard({ pet }) {
   const [userId, setUserId] = useState(0);
   const [autofillText, setAutofillText] = useState('');
   const [selectedItem, setSelectedItem] = useState(pet.breed);
+  const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'M/D/YY'));
+  const [selectedVaccine, setSelectedVaccine] = useState();
   const [itemList, setAnimal] = useState(emptyList);
+  const dogVaccinations = [
+    {
+      name: 'Distemper',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Hepititus',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Parvovirus',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Paraiflueza',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Rabies',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Leptospirosis',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Bordetella',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+  ];
+  const catVaccinations = [
+    {
+      name: 'Calicivirus',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Feline Leukemia',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Rabies',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Rhinotracheitis',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+    {
+      name: 'Panleukopenia',
+      date: getFormatedDate(getToday(), 'M/D/YY'),
+    },
+  ];
 
   const scrollX = new Animated.Value(0);
 
@@ -77,6 +132,22 @@ export default function PetCard({ pet }) {
     showPetRemoved(!petRemoved);
   };
 
+  const [isMealVisible, showAddMeal] = useState(false);
+  const toggleMeal = () => {
+    showAddMeal(!isMealVisible);
+  };
+
+  const [isMedicalVisible, showAddMedical] = useState(false);
+  const toggleMedical = () => {
+    showAddMedical(!isMedicalVisible);
+  };
+
+  /* toggle date modal */
+  const [isDateVisible, setDateVisible] = useState(false);
+  const toggleDate = () => {
+    setDateVisible(!isDateVisible);
+  };
+
   const [removeSuccess] = useState(false);
 
   const closeAll = () => {
@@ -102,6 +173,86 @@ export default function PetCard({ pet }) {
       />
     ));
   };
+
+  const displayDogVaccines = () => (
+    dogVaccinations.map((vaccination) => (
+      <View>
+        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+          <Text
+            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+          >
+            {vaccination.name}
+          </Text>
+          <Text
+            onPress={toggleDate}
+            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+          >
+            {vaccination.date}
+          </Text>
+        </Pressable>
+
+        <Modal
+          isVisible={isDateVisible}
+          onBackdropPress={toggleDate}
+          animationIn="fadeInUp"
+          animationInTiming={200}
+          animationOut="fadeOutDown"
+          animationOutTiming={200}
+        >
+          <DatePicker
+            options={styles.datePicker}
+            style={styles.dateContainer}
+            current={getToday()}
+            selected={getToday()}
+            mode="calendar"
+            onSelectedChange={(date) => {
+              setSelectedDate(getFormatedDate(date, 'M/D/YY'));
+            }}
+          />
+        </Modal>
+      </View>
+    ))
+  );
+
+  const displayCatVaccines = () => (
+    catVaccinations.map((vaccination) => (
+      <View>
+        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+          <Text
+            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+          >
+            {vaccination.name}
+          </Text>
+          <Text
+            onPress={toggleDate}
+            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+          >
+            {vaccination.date}
+          </Text>
+        </Pressable>
+
+        <Modal
+          isVisible={isDateVisible}
+          onBackdropPress={toggleDate}
+          animationIn="fadeInUp"
+          animationInTiming={200}
+          animationOut="fadeOutDown"
+          animationOutTiming={200}
+        >
+          <DatePicker
+            options={styles.datePicker}
+            style={styles.dateContainer}
+            current={getToday()}
+            selected={getToday()}
+            mode="calendar"
+            onSelectedChange={(date) => {
+              setSelectedDate(getFormatedDate(date, 'M/D/YY'));
+            }}
+          />
+        </Modal>
+      </View>
+    ))
+  );
 
   return (
 
@@ -315,7 +466,10 @@ export default function PetCard({ pet }) {
                   </View>
 
                   <View style={{ width: Dimensions.get('window').width }}>
-                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                    <Pressable
+                      onPress={toggleMeal}
+                      style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}
+                    >
                       <Feather
                         name="plus-circle"
                         size={50}
@@ -331,7 +485,132 @@ export default function PetCard({ pet }) {
                       </Text>
                     </Pressable>
 
-                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                    <Modal
+                      isVisible={isMealVisible}
+                      onBackdropPress={toggleMeal}
+                      animationIn="fadeInUp"
+                      animationInTiming={200}
+                      animationOut="fadeOutDown"
+                      animationOutTiming={200}
+                      style={{ margin: 0 }}
+                    >
+                      <View style={{
+                        backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
+                      }}
+                      >
+                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+                          <Text
+                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+                          >
+                            Food Brand
+                          </Text>
+                          <TextInput
+                            autoCorrect={false}
+                            clearTextOnFocus
+                            autoCapitalize="words"
+                            placeholder="Name"
+                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                          />
+                        </Pressable>
+
+                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+                          <Text
+                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+                          >
+                            Food Type
+                          </Text>
+                          <TextInput
+                            autoCorrect={false}
+                            clearTextOnFocus
+                            autoCapitalize="words"
+                            placeholder="Type"
+                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                          />
+                        </Pressable>
+
+                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+                          <Text
+                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+                          >
+                            Serving
+                          </Text>
+                          <TextInput
+                            autoCorrect={false}
+                            clearTextOnFocus
+                            autoCapitalize="words"
+                            placeholder="Amount"
+                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                          />
+                        </Pressable>
+
+                        <View style={[styles.menuItem,
+                          {
+                            width: Dimensions.get('window').width - 40,
+                            backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen,
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                            paddingTop: 0,
+                          }]}
+                        >
+                          <Pressable
+                            style={[styles.servingSizeButton,
+                              { paddingRight: 30, backgroundColor: pawPink }]}
+                          >
+                            <Text style={[styles.servingSizeText, { paddingLeft: 10 }]}>
+                              cups
+                            </Text>
+                          </Pressable>
+                          <Pressable style={styles.servingSizeButton}>
+                            <Text style={styles.servingSizeText}>
+                              grams
+                            </Text>
+                          </Pressable>
+                          <Pressable
+                            style={[styles.servingSizeButton,
+                              { paddingLeft: 40 }]}
+                          >
+                            <Text style={[styles.servingSizeText, { paddingRight: 40 }]}>
+                              mL
+                            </Text>
+                          </Pressable>
+                        </View>
+
+                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
+                          <Text
+                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+                          >
+                            Meal Time
+                          </Text>
+                          <TextInput
+                            autoCorrect={false}
+                            clearTextOnFocus
+                            autoCapitalize="words"
+                            placeholder="Time"
+                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                          />
+                        </Pressable>
+
+                        <Pressable
+                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                          onPress={toggleMeal}
+                        >
+                          <Text
+                            style={styles.submittext}
+                          >
+                            Add Meal
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </Modal>
+
+                    <Pressable
+                      onPress={toggleMedical}
+                      style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}
+                    >
                       <Feather
                         name="plus-circle"
                         size={50}
@@ -343,9 +622,37 @@ export default function PetCard({ pet }) {
                         numberOfLines={1}
                         adjustsFontSizeToFit
                       >
-                        Add Medical Information
+                        Add Vaccine Information
                       </Text>
                     </Pressable>
+
+                    <Modal
+                      isVisible={isMedicalVisible}
+                      onBackdropPress={toggleMedical}
+                      animationIn="fadeInUp"
+                      animationInTiming={200}
+                      animationOut="fadeOutDown"
+                      animationOutTiming={200}
+                      style={{ margin: 0 }}
+                    >
+                      <View style={{
+                        backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
+                      }}
+                      >
+                        { catDog === 'dog' ? (displayDogVaccines()) : (displayCatVaccines())}
+
+                        <Pressable
+                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                          onPress={toggleMedical}
+                        >
+                          <Text
+                            style={styles.submittext}
+                          >
+                            Add Vaccines
+                          </Text>
+                        </Pressable>
+                      </View>
+                    </Modal>
                   </View>
                 </Animated.ScrollView>
               </KeyboardAwareScrollView>

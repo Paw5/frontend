@@ -8,8 +8,11 @@ import { Feather } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSelector } from 'react-redux';
 import dateFormat from 'dateformat';
+import Network from '../util/Network';
 import lstyles, { pawPink } from '../constants/Styles';
 import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
+
+const _ = Network();
 
 export default function VaccineReminder({ pets }) {
   const [styles, setStyles] = useState(lstyles);
@@ -40,124 +43,52 @@ export default function VaccineReminder({ pets }) {
     setCurrentPet(pet);
   };
 
+  const [areVaccinesLoaded, setVaccinesLoaded] = useState(false);
+  const [currentVaccinations, setCurrentVaccinations] = useState([]);
+  const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
+  const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
+
   // eslint-disable-next-line consistent-return
   function displayVaccineList() {
     if (currentPet) {
+      if (!areVaccinesLoaded) {
+        _.get('vaccinations', {
+          params: {
+            pet_id: currentPet.pet_id,
+          },
+        }).then((results) => {
+          const vaccinations = results.data().results;
+
+          setCurrentVaccinations(vaccinations);
+          setVaccinesLoaded(true);
+        });
+      }
+
       if (currentPet.type === 'dog') {
         return (
-          <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+          dogVaccinations.map((vaccination) => (
             <View style={styles.appointmentPiece}>
               <Text style={styles.vaccineText}>
-                Distemper
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Hepititus
+                {vaccination}
               </Text>
               <Text style={styles.expiredVaccine}>
                 {dateFormat(new Date(), 'm/d/yy')}
               </Text>
             </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Parvovirus
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Parainfluenza
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Rabies
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Leptospirosis
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                Bordetella
-              </Text>
-              <Text style={styles.activeVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-          </Pressable>
+          ))
         );
       }
       return (
-        <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+        catVaccinations.map((vaccination) => (
           <View style={styles.appointmentPiece}>
             <Text style={styles.vaccineText}>
-              Calicivirus
+              {vaccination}
             </Text>
             <Text style={styles.expiredVaccine}>
               {dateFormat(new Date(), 'm/d/yy')}
             </Text>
           </View>
-
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.vaccineText}>
-              Feline Leukemia
-            </Text>
-            <Text style={styles.activeVaccine}>
-              {dateFormat(new Date(), 'm/d/yy')}
-            </Text>
-          </View>
-
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.vaccineText}>
-              Rabies
-            </Text>
-            <Text style={styles.expiredVaccine}>
-              {dateFormat(new Date(), 'm/d/yy')}
-            </Text>
-          </View>
-
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.vaccineText}>
-              Rhinotracheitis
-            </Text>
-            <Text style={styles.activeVaccine}>
-              {dateFormat(new Date(), 'm/d/yy')}
-            </Text>
-          </View>
-
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.vaccineText}>
-              Panleukopenia
-            </Text>
-            <Text style={styles.activeVaccine}>
-              {dateFormat(new Date(), 'm/d/yy')}
-            </Text>
-          </View>
-        </Pressable>
+        ))
       );
     }
   }
@@ -219,7 +150,11 @@ export default function VaccineReminder({ pets }) {
                   />
                 </View>
 
-                {displayVaccineList()}
+                <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+
+                  {displayVaccineList()}
+
+                </Pressable>
               </View>
             </KeyboardAwareScrollView>
           </TouchableWithoutFeedback>

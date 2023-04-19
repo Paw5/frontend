@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useSelector } from 'react-redux';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { Feather } from '@expo/vector-icons';
 import lstyles, {
   pawPink, pawGrey, pawWhite,
@@ -28,6 +29,16 @@ export default function AccountCard() {
   const [isEditVisible, setEditVisible] = useState(false);
   const toggleEdit = () => {
     setEditVisible(!isEditVisible);
+  };
+
+  const [petEdited, showPetEdited] = useState(false);
+  const toggleSuccess = () => {
+    showPetEdited(!petEdited);
+  };
+
+  const closeAll = () => {
+    showPetEdited(false);
+    setEditVisible(false);
   };
 
   return (
@@ -169,13 +180,29 @@ export default function AccountCard() {
                   />
                 </Pressable>
 
-                <Pressable style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}>
+                <Pressable
+                  style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                  onPress={toggleSuccess}
+                >
                   <Text
                     style={styles.submittext}
                   >
                     Submit
                   </Text>
                 </Pressable>
+
+                <AwesomeAlert
+                  show={petEdited}
+                  title="Pet Updated!"
+                  confirmText="Yay!"
+                  titleStyle={styles.alertText}
+                  contentContainerStyle={styles.alertBackground}
+                  showConfirmButton
+                  confirmButtonTextStyle={styles.confirmButton}
+                  onConfirmPressed={closeAll}
+                  style={{ borderRadius: 50, overflow: 'hidden' }}
+                  confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                />
 
                 <Pressable style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? '#d94545' : '#b81d1d' }]}>
                   <Text

@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { LineChart } from 'react-native-chart-kit';
 import { useSelector } from 'react-redux';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
 import dateFormat from 'dateformat';
 import lstyles, {
@@ -41,6 +42,16 @@ export default function WalkGraph() {
   const [isDateVisible, setDateVisible] = useState(false);
   const toggleDate = () => {
     setDateVisible(!isDateVisible);
+  };
+
+  const [eventAdded, showEventAdded] = useState(false);
+  const toggleSuccess = () => {
+    showEventAdded(!eventAdded);
+  };
+
+  const closeAll = () => {
+    showEventAdded(false);
+    setAddVisible(false);
   };
 
   const data = {
@@ -208,6 +219,7 @@ export default function WalkGraph() {
 
               <Pressable
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                onPress={toggleSuccess}
               >
                 <Text
                   style={styles.submittext}
@@ -215,6 +227,19 @@ export default function WalkGraph() {
                   Add to Graph
                 </Text>
               </Pressable>
+
+              <AwesomeAlert
+                show={eventAdded}
+                title="Walk Added!"
+                confirmText="Yay!"
+                titleStyle={styles.alertText}
+                contentContainerStyle={styles.alertBackground}
+                showConfirmButton
+                confirmButtonTextStyle={styles.confirmButton}
+                onConfirmPressed={closeAll}
+                style={{ borderRadius: 50, overflow: 'hidden' }}
+                confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+              />
             </View>
           </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>

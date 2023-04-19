@@ -9,6 +9,7 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import dateFormat from 'dateformat';
 import * as Calendar from 'expo-calendar';
 import lstyles, {
@@ -28,23 +29,46 @@ async function createCalendar() {
   const defaultCalendarSource = Platform.OS === 'ios'
     ? await getDefaultCalendarSource()
     : { isLocalAccount: true, name: 'Paw5' };
-  const newCalendarID = await Calendar.createCalendarAsync({
-    title: 'Paw5',
-    color: '#69a297',
-    entityType: Calendar.EntityTypes.EVENT,
-    sourceId: defaultCalendarSource.id,
-    source: defaultCalendarSource,
-    name: 'internalCalendarName',
-    ownerAccount: 'personal',
-    accessLevel: Calendar.CalendarAccessLevel.OWNER,
-  });
 
-  newID = newCalendarID;
+  const existingCalendar = await AsyncStorage.getItem('@calendarID');
+
+  if (typeof (calendarExists) !== 'object') {
+    newID = existingCalendar;
+  } else {
+    const newCalendarID = await Calendar.createCalendarAsync({
+      title: 'Paw5',
+      color: '#69a297',
+      entityType: Calendar.EntityTypes.EVENT,
+      sourceId: defaultCalendarSource.id,
+      source: defaultCalendarSource,
+      name: 'internalCalendarName',
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    newID = newCalendarID;
+    AsyncStorage.setItem('@calendarID', newCalendarID);
+  }
+}
+
+async function getMonthsEvents() {
+  const currentCalendar = [await AsyncStorage.getItem('@calendarID')];
+
+  const startDate = new Date();
+  const month = startDate.getMonth() + 1;
+  const endDate = new Date();
+  endDate.setMonth(month);
+
+  const monthsEvents = await
+  Calendar.getEventsAsync(currentCalendar, new Date(startDate), new Date(endDate));
+
+  return monthsEvents;
 }
 
 export default function UpcomingAppointments() {
   const dispatch = useDispatch();
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+  const [monthsEvents, setMonthsEvents] = useState([]);
+  const [allEventsCollected, setEventsCollected] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -55,6 +79,14 @@ export default function UpcomingAppointments() {
       }
     })();
   }, []);
+
+  if (!allEventsCollected) {
+    (async () => {
+      const events = await getMonthsEvents();
+      setMonthsEvents(events);
+      setEventsCollected(true);
+    })();
+  }
 
   function addHour(date) {
     const endHour = new Date(date);
@@ -70,6 +102,8 @@ export default function UpcomingAppointments() {
     };
 
     await Calendar.createEventAsync(ID, newEvent);
+
+    setEventsCollected(false);
   }
 
   const [eventAdded, showEventAdded] = useState(false);
@@ -119,23 +153,18 @@ export default function UpcomingAppointments() {
         style={styles.healthDivider}
       />
       <View style={{ flex: 2 }}>
-        <View style={styles.appointmentPiece}>
-          <Text style={styles.appointmentText}>
-            Appointment Name
-          </Text>
-          <Text style={styles.appointmentText}>
-            Date
-          </Text>
-        </View>
 
-        <View style={styles.appointmentPiece}>
-          <Text style={styles.appointmentText}>
-            Appointment Name
-          </Text>
-          <Text style={styles.appointmentText}>
-            Date
-          </Text>
-        </View>
+        { monthsEvents.map((event, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <View style={styles.appointmentPiece} key={`appointment-${index}`}>
+            <Text style={styles.appointmentText}>
+              {event.title}
+            </Text>
+            <Text style={styles.appointmentText}>
+              {dateFormat(event.startDate, 'm/dd @ h:MM tt')}
+            </Text>
+          </View>
+        )) }
 
       </View>
 

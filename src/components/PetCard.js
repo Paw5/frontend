@@ -1,33 +1,420 @@
 import {
-  Text, Pressable, Image, View,
+  View, Text, Dimensions, Pressable, Image, TouchableWithoutFeedback,
+  ScrollView, Platform, TextInput, TouchableOpacity, Animated,
+  Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import Modal from 'react-native-modal';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
 import { useSelector } from 'react-redux';
-import lstyles from '../constants/Styles';
-import dstyles from '../constants/DarkStyles';
+import AwesomeAlert from 'react-native-awesome-alerts';
+import Collapsible from '@eliav2/react-native-collapsible-view';
+import { Feather } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
+import lstyles, {
+  pawPink, pawWhite, pawGrey,
+} from '../constants/Styles';
+import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
+import Network from '../util/Network';
+import dogBreeds from '../constants/dogBreeds.json';
+import catBreeds from '../constants/catBreeds.json';
 
+const dBreeds = dogBreeds.breeds;
+const cBreeds = catBreeds.breeds;
+const PickerItem = Picker.Item;
 const miso = require('../../assets/petPhotos/miso.jpg');
 
-export default function PetCard() {
+const emptyList = [];
+
+const _ = Network();
+
+export default function PetCard({ pet }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
+  const {
+    pet_name: petName, fur_color: furColor, microchip: chipNumber, pet_id: petID, type: catDog,
+  } = pet;
+  const [userId, setUserId] = useState(0);
+  const [autofillText, setAutofillText] = useState('');
+  const [selectedItem, setSelectedItem] = useState(pet.breed);
+  const [itemList, setAnimal] = useState(emptyList);
+
+  const scrollX = new Animated.Value(0);
+
+  if (!userId) {
+    _.get('login').then((response) => {
+      response.onSuccess((results) => {
+        setUserId(results.data.user_id);
+
+        if (catDog === 'dog') {
+          setAnimal(dBreeds);
+        } else if (catDog === 'cat') {
+          setAnimal(cBreeds);
+        }
+      });
+    });
+  }
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);
   }, [isDarkMode]);
 
+  /* toggle edit pet section modal */
+  const [isEditVisible, setEditVisible] = useState(false);
+  const toggleEdit = () => {
+    setEditVisible(!isEditVisible);
+  };
+
+  const [petEdited, showPetEdited] = useState(false);
+  const toggleSuccess = () => {
+    showPetEdited(!petEdited);
+  };
+
+  const [petRemoved, showPetRemoved] = useState(false);
+  const toggleRemove = () => {
+    showPetRemoved(!petRemoved);
+  };
+
+  const [removeSuccess] = useState(false);
+
+  const closeAll = () => {
+    showPetEdited(false);
+    setEditVisible(false);
+    showPetRemoved(false);
+  };
+
+  const removePetFromDB = async () => {
+    const networkResponse = await _.delete(`pets/${userId}/${petID}`);
+    networkResponse.onSuccess(() => (
+      <AwesomeAlert
+        show={removeSuccess}
+        title="Pet Deleted!"
+        confirmText="Yay!"
+        titleStyle={styles.alertText}
+        contentContainerStyle={styles.alertBackground}
+        showConfirmButton
+        confirmButtonTextStyle={styles.confirmButton}
+        onConfirmPressed={closeAll}
+        style={{ borderRadius: 50, overflow: 'hidden' }}
+        confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+      />
+    ));
+  };
+
   return (
 
-    <View style={styles.transparentBG}>
-      <Pressable style={styles.petCard}>
-        <Image
-          style={styles.petImage}
-          source={miso}
-        />
-        <Text style={styles.petHeader}>Miso</Text>
+    <View>
+      <View style={styles.transparentBG}>
+        <Pressable style={styles.petCard}>
+          <Image
+            style={styles.petImage}
+            source={miso}
+          />
 
-      </Pressable>
+          <View style={styles.accountHeaderView}>
+            <Text style={styles.petHeader}>{petName}</Text>
+            <Pressable onPress={toggleEdit}>
+              <Feather
+                name="settings"
+                size={30}
+                color={isDarkMode === 'light' ? pawGreen : pawPink}
+                style={styles.indianRedXCircle}
+              />
+            </Pressable>
+          </View>
+
+        </Pressable>
+      </View>
+
+      {/* edit pet modal */}
+      <Modal
+        isVisible={isEditVisible}
+        animationIn="slideInRight"
+        animationOut="slideOutRight"
+        hasBackdrop={false}
+        style={styles.accountModal}
+      >
+        <View>
+          <Pressable
+            onPress={toggleEdit}
+            style={{ alignSelf: 'flex-start' }}
+          >
+            <Feather
+              name="chevron-left"
+              size={30}
+              color={isDarkMode === 'light' ? pawYellow : pawPink}
+              style={[styles.exitButton, { marginBottom: -30 }]}
+            />
+
+          </Pressable>
+
+          <View>
+            <View style={{ justifyContent: 'flex-end' }}>
+              <Image
+                resizeMode="cover"
+                style={styles.profileIcon}
+                source={miso}
+              />
+              <Pressable>
+                <Feather
+                  name="camera"
+                  size={30}
+                  color={isDarkMode === 'light' ? pawLightGrey : pawPink}
+                  style={styles.cameraIcon}
+                />
+              </Pressable>
+            </View>
+          </View>
+
+          <View style={[styles.menuItem, styles.usernameField]}>
+            <Text
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              style={[styles.menuText, styles.usernameFont]}
+            >
+              {petName}
+            </Text>
+          </View>
+
+          <View style={styles.scrollIndicator}>
+            <RNAnimatedScrollIndicators
+              numberOfCards={2}
+              scrollWidth={Dimensions.get('window').width}
+              activeColor={isDarkMode === 'light' ? pawYellow : pawPink}
+              inActiveColor={isDarkMode === 'light' ? pawLightGrey : pawWhite}
+              scrollAnimatedValue={scrollX}
+              style={{
+                alignSelf: 'center',
+                justifyContent: 'center',
+              }}
+            />
+          </View>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ height: Dimensions.get('window').width / 1.30, marginBottom: 15, marginTop: -10 }}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <KeyboardAwareScrollView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              >
+                <Animated.ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  snapToAlignment="center"
+                  snapToInterval={Dimensions.get('window').width}
+                  decelerationRate="fast"
+                  disableIntervalMomentum
+                  directionalLockEnabled
+                  pagingEnabled
+                  scrollEventThrottle={14}
+                  onScroll={
+                    Animated.event(
+                      [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                      { useNativeDriver: true },
+                    )
+                  }
+                >
+                  <View style={{ width: Dimensions.get('window').width }}>
+                    <Collapsible
+                      style={styles.breedBubble}
+                      touchableComponent
+                      noArrow
+                      title={(
+                        <View>
+                          <Text
+                            style={styles.breedHeader}
+                          >
+                            Breed
+                          </Text>
+                          <TextInput
+                            style={styles.breedSelection}
+                            placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                            onChangeText={(value) => {
+                              setAutofillText(value);
+                            }}
+                            defaultValue={selectedItem}
+                            clearTextOnFocus
+                          />
+                        </View>
+                    )}
+                    >
+                      <TouchableOpacity>
+                        <Picker
+                          style={styles.dropdown}
+                          itemStyle={styles.dropdown}
+                          selectedValue={selectedItem}
+                          onValueChange={(index) => {
+                            setSelectedItem(index);
+                          }}
+                        >
+                          {itemList.filter(
+                            (value) => value.includes(autofillText),
+                          ).map((value) => (
+                            <PickerItem
+                              label={value}
+                              value={value}
+                              key={value}
+                            />
+                          ))}
+                        </Picker>
+                      </TouchableOpacity>
+                    </Collapsible>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Color
+                      </Text>
+                      <TextInput
+                        autoCorrect={false}
+                        clearTextOnFocus
+                        autoCapitalize="words"
+                        defaultValue={furColor}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                      />
+                    </Pressable>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Weight
+                      </Text>
+                      <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+                        <TextInput
+                          autoCorrect={false}
+                          clearTextOnFocus
+                          defaultValue={pet.weight.toString()}
+                          style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                        />
+                        <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
+                          lbs
+                        </Text>
+                      </View>
+                    </Pressable>
+
+                    <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40 }]}>
+                      <Text
+                        style={[styles.menuText, styles.accountFields]}
+                      >
+                        Microchip ID
+                      </Text>
+                      <TextInput
+                        autoCorrect={false}
+                        clearTextOnFocus
+                        keyboardType="number-pad"
+                        inputMode="number"
+                        defaultValue={chipNumber}
+                        style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                      />
+                    </Pressable>
+                  </View>
+
+                  <View style={{ width: Dimensions.get('window').width }}>
+                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                      <Feather
+                        name="plus-circle"
+                        size={50}
+                        color={isDarkMode === 'light' ? pawGreen : pawPink}
+                        style={{ marginBottom: 5 }}
+                      />
+                      <Text
+                        style={[styles.medicalText]}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                      >
+                        Add Meal Information
+                      </Text>
+                    </Pressable>
+
+                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                      <Feather
+                        name="plus-circle"
+                        size={50}
+                        color={isDarkMode === 'light' ? pawGreen : pawPink}
+                        style={{ marginBottom: 5 }}
+                      />
+                      <Text
+                        style={[styles.medicalText]}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                      >
+                        Add Medical Information
+                      </Text>
+                    </Pressable>
+                  </View>
+                </Animated.ScrollView>
+              </KeyboardAwareScrollView>
+            </TouchableWithoutFeedback>
+          </ScrollView>
+
+          <Pressable
+            style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+            onPress={toggleSuccess}
+          >
+            <Text
+              style={styles.submittext}
+            >
+              Submit
+            </Text>
+          </Pressable>
+
+          <AwesomeAlert
+            show={petEdited}
+            title="Pet Updated!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeAll}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
+
+          <Pressable
+            style={
+                    [
+                      styles.submitbutton,
+                      {
+                        width: Dimensions.get('window').width - 40,
+                        backgroundColor: isDarkMode === 'light' ? '#d94545' : '#b81d1d',
+                      },
+                    ]
+                  }
+            onPress={toggleRemove}
+          >
+            <Text
+              style={[styles.submittext, { color: pawWhite }]}
+            >
+              Delete Pet
+            </Text>
+          </Pressable>
+
+          <AwesomeAlert
+            show={petRemoved}
+            title="Are you sure?"
+            confirmText="Cancel"
+            cancelText="Delete"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            showCancelButton
+            confirmButtonTextStyle={styles.confirmButton}
+            cancelButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={toggleRemove}
+            onCancelPressed={removePetFromDB}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+            cancelButtonColor={isDarkMode === 'light' ? '#d94545' : '#b81d1d'}
+          />
+
+        </View>
+      </Modal>
     </View>
   );
 }

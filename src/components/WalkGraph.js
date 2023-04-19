@@ -24,7 +24,6 @@ const darkDots = () => pawGreen;
 export default function WalkGraph() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);

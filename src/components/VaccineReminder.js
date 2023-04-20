@@ -1,6 +1,7 @@
 import {
   View, Text, Pressable, Keyboard,
   Platform, TouchableWithoutFeedback,
+  LogBox,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
@@ -11,6 +12,9 @@ import dateFormat from 'dateformat';
 import Network from '../util/Network';
 import lstyles, { pawPink } from '../constants/Styles';
 import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
+
+LogBox.ignoreLogs(['Warning: Each child in a list should have a unique "key" prop.']);
+LogBox.ignoreLogs(['Deprecation warning: value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are discouraged. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.']);
 
 const _ = Network();
 
@@ -52,18 +56,18 @@ export default function VaccineReminder({ pets }) {
   // eslint-disable-next-line consistent-return
   function displayVaccineList() {
     if (currentPet) {
-      if (!areVaccinesLoaded) {
-        _.get('vaccinations', {
-          params: {
-            pet_id: currentPet.pet_id,
-          },
-        }).then((results) => {
-          const vaccinations = results.data().results;
+      // if (!areVaccinesLoaded) {
+      //   _.get('vaccinations', {
+      //     params: {
+      //       pet_id: currentPet.pet_id,
+      //     },
+      //   }).then((results) => {
+      //     const vaccinations = results.data().results;
 
-          setCurrentVaccinations(vaccinations);
-          setVaccinesLoaded(true);
-        });
-      }
+      //     setCurrentVaccinations(vaccinations);
+      //     setVaccinesLoaded(true);
+      //   });
+      // }
 
       if (currentPet.type === 'dog') {
         return (
@@ -103,9 +107,8 @@ export default function VaccineReminder({ pets }) {
       />
       <View style={{ flex: 2 }}>
 
-        {petList.map((pet, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Pressable onPress={() => { setCurrentPet(pet); openStatus(); }} id={pet} key={`pet-line-${index}`}>
+        {petList.map((pet) => (
+          <Pressable onPress={() => { setCurrentPet(pet); openStatus(); }} id={pet} key={`pet-line-${pet.pet_name}`}>
             <View style={styles.appointmentPiece}>
               <Text style={styles.appointmentText}>
                 {pet.pet_name}

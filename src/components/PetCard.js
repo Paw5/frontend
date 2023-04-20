@@ -119,6 +119,7 @@ export default function PetCard({ pet }) {
   };
 
   const addVaccineToPet = async () => {
+    console.log(formEntry);
     const networkResponse = await _.post(`vaccinations/${petID}`, formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
@@ -216,8 +217,9 @@ export default function PetCard({ pet }) {
             selected={getToday()}
             mode="calendar"
             onSelectedChange={(date) => {
-              updateFormEntry('time', date);
+              updateFormEntry('time', new Date(date));
               setSelectedDate(getFormatedDate(date, 'M/D/YY'));
+              console.log(new Date(selectedDate));
             }}
           />
         </Modal>

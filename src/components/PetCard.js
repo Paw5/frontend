@@ -42,6 +42,7 @@ export default function PetCard({ pet }) {
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'M/D/YY'));
   const [selectedVaccine, setSelectedVaccine] = useState('Select Vaccination');
   const [itemList, setAnimal] = useState(emptyList);
+  const [formEntry, setFormEntry] = useState({});
   const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Paraiflueza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
@@ -60,6 +61,12 @@ export default function PetCard({ pet }) {
       });
     });
   }
+
+  const updateFormEntry = (key, value) => {
+    const newFormEntry = formEntry;
+    newFormEntry[key] = value;
+    setFormEntry(newFormEntry);
+  };
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -80,6 +87,11 @@ export default function PetCard({ pet }) {
   const [petRemoved, showPetRemoved] = useState(false);
   const toggleRemove = () => {
     showPetRemoved(!petRemoved);
+  };
+
+  const [vaccineAdded, showVaccineAdded] = useState(false);
+  const toggleAddVaccine = () => {
+    showVaccineAdded(!vaccineAdded);
   };
 
   const [isMealVisible, showAddMeal] = useState(false);
@@ -104,6 +116,14 @@ export default function PetCard({ pet }) {
     showPetEdited(false);
     setEditVisible(false);
     showPetRemoved(false);
+  };
+
+  const addVaccineToPet = async () => {
+    const networkResponse = await _.post(`vaccinations/${petID}`, formEntry);
+    networkResponse.onSuccess(() => {
+      setFormEntry({});
+      toggleAddVaccine();
+    });
   };
 
   const removePetFromDB = async () => {
@@ -151,6 +171,7 @@ export default function PetCard({ pet }) {
             itemStyle={styles.dropdown}
             selectedValue={selectedVaccine}
             onValueChange={(index) => {
+              updateFormEntry('name', index);
               setSelectedVaccine(index);
             }}
           >
@@ -195,6 +216,7 @@ export default function PetCard({ pet }) {
             selected={getToday()}
             mode="calendar"
             onSelectedChange={(date) => {
+              updateFormEntry('time', date);
               setSelectedDate(getFormatedDate(date, 'M/D/YY'));
             }}
           />
@@ -218,6 +240,7 @@ export default function PetCard({ pet }) {
             style={[styles.menuText, {
               fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
             }]}
+            onChangeText={(text) => updateFormEntry('frequency', text)}
           />
           <Text style={[styles.menuText, {
             fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
@@ -258,6 +281,7 @@ export default function PetCard({ pet }) {
             selectedValue={selectedVaccine}
             onValueChange={(index) => {
               setSelectedVaccine(index);
+              updateFormEntry('name', index);
             }}
           >
             {catVaccinations.map((value) => (
@@ -301,6 +325,7 @@ export default function PetCard({ pet }) {
             selected={getToday()}
             mode="calendar"
             onSelectedChange={(date) => {
+              updateFormEntry('time', date);
               setSelectedDate(getFormatedDate(date, 'M/D/YY'));
             }}
           />
@@ -324,6 +349,7 @@ export default function PetCard({ pet }) {
             style={[styles.menuText, {
               fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
             }]}
+            onChangeText={(text) => updateFormEntry('frequency', text)}
           />
           <Text style={[styles.menuText, {
             fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
@@ -763,7 +789,10 @@ export default function PetCard({ pet }) {
 
                         <Pressable
                           style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
-                          onPress={toggleMedical}
+                          onPress={() => {
+                            addVaccineToPet();
+                            toggleAddVaccine();
+                          }}
                         >
                           <Text
                             style={styles.submittext}
@@ -771,6 +800,22 @@ export default function PetCard({ pet }) {
                             Add Vaccination
                           </Text>
                         </Pressable>
+
+                        <AwesomeAlert
+                          show={vaccineAdded}
+                          title="Vaccine Added!"
+                          confirmText="Yay!"
+                          titleStyle={styles.alertText}
+                          contentContainerStyle={styles.alertBackground}
+                          showConfirmButton
+                          confirmButtonTextStyle={styles.confirmButton}
+                          onConfirmPressed={() => {
+                            toggleAddVaccine();
+                            toggleMedical();
+                          }}
+                          style={{ borderRadius: 50, overflow: 'hidden' }}
+                          confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                        />
                       </View>
                     </Modal>
                   </View>

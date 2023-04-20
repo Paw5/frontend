@@ -7,10 +7,10 @@ import { useSelector } from 'react-redux';
 import lstyles, { pawPink } from '../constants/Styles';
 import dstyles, { pawGreen } from '../constants/DarkStyles';
 
-export default function PetCard({ pet }) {
+export default function PetCard() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-  const { pet_name: petName } = pet;
+  // const { pet_name: petName } = pet;
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);

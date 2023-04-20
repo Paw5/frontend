@@ -38,13 +38,14 @@ export default function VaccineReminder({ pets }) {
     setStatusVisible(!isStatusVisible);
   };
 
-  const openStatus = (pet) => {
+  const [areVaccinesLoaded, setVaccinesLoaded] = useState(false);
+  const [setCurrentVaccinations] = useState([]);
+
+  const openStatus = () => {
+    setVaccinesLoaded(false);
     toggleStatus();
-    setCurrentPet(pet);
   };
 
-  const [areVaccinesLoaded, setVaccinesLoaded] = useState(false);
-  const [currentVaccinations, setCurrentVaccinations] = useState([]);
   const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
@@ -104,7 +105,7 @@ export default function VaccineReminder({ pets }) {
 
         {petList.map((pet, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <Pressable onPress={() => openStatus(pet)} id={pet} key={`pet-line-${index}`}>
+          <Pressable onPress={() => { setCurrentPet(pet); openStatus(); }} id={pet} key={`pet-line-${index}`}>
             <View style={styles.appointmentPiece}>
               <Text style={styles.appointmentText}>
                 {pet.pet_name}
@@ -129,7 +130,7 @@ export default function VaccineReminder({ pets }) {
             >
               <View>
                 <Pressable
-                  onPress={toggleStatus}
+                  onPress={() => { toggleStatus(); }}
                   style={{ alignSelf: 'flex-start' }}
                 >
                   <Feather
@@ -150,11 +151,11 @@ export default function VaccineReminder({ pets }) {
                   />
                 </View>
 
-                <Pressable style={[styles.healthContainer, { paddingBottom: 20 }]}>
+                <View style={[styles.healthContainer, { paddingBottom: 20 }]}>
 
                   {displayVaccineList()}
 
-                </Pressable>
+                </View>
               </View>
             </KeyboardAwareScrollView>
           </TouchableWithoutFeedback>

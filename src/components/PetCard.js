@@ -1,7 +1,7 @@
 import {
   View, Text, Dimensions, Pressable, Image, TouchableWithoutFeedback,
   ScrollView, Platform, TextInput, TouchableOpacity, Animated,
-  Keyboard,
+  Keyboard, KeyboardAvoidingView,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
@@ -40,60 +40,10 @@ export default function PetCard({ pet }) {
   const [autofillText, setAutofillText] = useState('');
   const [selectedItem, setSelectedItem] = useState(pet.breed);
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'M/D/YY'));
-  const [selectedVaccine, setSelectedVaccine] = useState();
+  const [selectedVaccine, setSelectedVaccine] = useState('Select Vaccination');
   const [itemList, setAnimal] = useState(emptyList);
-  const dogVaccinations = [
-    {
-      name: 'Distemper',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Hepititus',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Parvovirus',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Paraiflueza',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Rabies',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Leptospirosis',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Bordetella',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-  ];
-  const catVaccinations = [
-    {
-      name: 'Calicivirus',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Feline Leukemia',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Rabies',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Rhinotracheitis',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-    {
-      name: 'Panleukopenia',
-      date: getFormatedDate(getToday(), 'M/D/YY'),
-    },
-  ];
+  const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Paraiflueza', 'Rabies', 'Leptospirosis', 'Bordetella'];
+  const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
   const scrollX = new Animated.Value(0);
 
@@ -175,21 +125,60 @@ export default function PetCard({ pet }) {
   };
 
   const displayDogVaccines = () => (
-    dogVaccinations.map((vaccination) => (
-      <View>
-        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-          <Text
-            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+    <View>
+      <Collapsible
+        style={styles.vaccineBubble}
+        touchableComponent
+        noArrow
+        title={(
+          <View>
+            <Text
+              style={styles.vaccineHeader}
+            >
+              Breed
+            </Text>
+            <Text
+              style={styles.vaccineSelection}
+            >
+              {selectedVaccine}
+            </Text>
+          </View>
+        )}
+      >
+        <TouchableOpacity>
+          <Picker
+            style={styles.dropdown}
+            itemStyle={styles.dropdown}
+            selectedValue={selectedVaccine}
+            onValueChange={(index) => {
+              setSelectedVaccine(index);
+            }}
           >
-            {vaccination.name}
-          </Text>
-          <Text
-            onPress={toggleDate}
-            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-          >
-            {vaccination.date}
-          </Text>
-        </Pressable>
+            {dogVaccinations.map((value) => (
+              <PickerItem
+                label={value}
+                value={value}
+                key={value}
+              />
+            ))}
+          </Picker>
+        </TouchableOpacity>
+      </Collapsible>
+
+      <Pressable
+        style={[styles.vaccineBubble, { width: Dimensions.get('window').width - 40 }]}
+        onPress={toggleDate}
+      >
+        <Text
+          style={[styles.vaccineHeader, { paddingTop: 20 }]}
+        >
+          Last Vaccination
+        </Text>
+        <Text
+          style={styles.vaccineSelection}
+        >
+          {selectedDate}
+        </Text>
 
         <Modal
           isVisible={isDateVisible}
@@ -210,26 +199,92 @@ export default function PetCard({ pet }) {
             }}
           />
         </Modal>
-      </View>
-    ))
+      </Pressable>
+
+      <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+        <Text
+          style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+        >
+          Frequency
+        </Text>
+        <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+          <TextInput
+            autoCorrect={false}
+            clearTextOnFocus
+            keyboardType="decimal-pad"
+            inputMode="number"
+            placeholder="X"
+            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+            style={[styles.menuText, {
+              fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+            }]}
+          />
+          <Text style={[styles.menuText, {
+            fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
+          }]}
+          >
+            years
+          </Text>
+        </View>
+      </Pressable>
+    </View>
   );
 
   const displayCatVaccines = () => (
-    catVaccinations.map((vaccination) => (
-      <View>
-        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-          <Text
-            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
+    <View>
+      <Collapsible
+        style={styles.vaccineBubble}
+        touchableComponent
+        noArrow
+        title={(
+          <View>
+            <Text
+              style={styles.vaccineHeader}
+            >
+              Breed
+            </Text>
+            <Text
+              style={styles.vaccineSelection}
+            >
+              {selectedVaccine}
+            </Text>
+          </View>
+          )}
+      >
+        <TouchableOpacity>
+          <Picker
+            style={styles.dropdown}
+            itemStyle={styles.dropdown}
+            selectedValue={selectedVaccine}
+            onValueChange={(index) => {
+              setSelectedVaccine(index);
+            }}
           >
-            {vaccination.name}
-          </Text>
-          <Text
-            onPress={toggleDate}
-            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-          >
-            {vaccination.date}
-          </Text>
-        </Pressable>
+            {catVaccinations.map((value) => (
+              <PickerItem
+                label={value}
+                value={value}
+                key={value}
+              />
+            ))}
+          </Picker>
+        </TouchableOpacity>
+      </Collapsible>
+
+      <Pressable
+        style={[styles.vaccineBubble, { width: Dimensions.get('window').width - 40 }]}
+        onPress={toggleDate}
+      >
+        <Text
+          style={[styles.vaccineHeader, { paddingTop: 20 }]}
+        >
+          Last Vaccination
+        </Text>
+        <Text
+          style={styles.vaccineSelection}
+        >
+          {selectedDate}
+        </Text>
 
         <Modal
           isVisible={isDateVisible}
@@ -250,8 +305,35 @@ export default function PetCard({ pet }) {
             }}
           />
         </Modal>
-      </View>
-    ))
+      </Pressable>
+
+      <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+        <Text
+          style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+        >
+          Frequency
+        </Text>
+        <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+          <TextInput
+            autoCorrect={false}
+            clearTextOnFocus
+            keyboardType="decimal-pad"
+            inputMode="number"
+            placeholder="X"
+            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+            style={[styles.menuText, {
+              fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+            }]}
+          />
+          <Text style={[styles.menuText, {
+            fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
+          }]}
+          >
+            years
+          </Text>
+        </View>
+      </Pressable>
+    </View>
   );
 
   return (
@@ -494,117 +576,155 @@ export default function PetCard({ pet }) {
                       animationOutTiming={200}
                       style={{ margin: 0 }}
                     >
-                      <View style={{
-                        backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
-                      }}
+                      <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                       >
-                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-                          <Text
-                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
-                          >
-                            Food Brand
-                          </Text>
-                          <TextInput
-                            autoCorrect={false}
-                            clearTextOnFocus
-                            autoCapitalize="words"
-                            placeholder="Name"
-                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-                          />
-                        </Pressable>
-
-                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-                          <Text
-                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
-                          >
-                            Food Type
-                          </Text>
-                          <TextInput
-                            autoCorrect={false}
-                            clearTextOnFocus
-                            autoCapitalize="words"
-                            placeholder="Type"
-                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-                          />
-                        </Pressable>
-
-                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-                          <Text
-                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
-                          >
-                            Serving
-                          </Text>
-                          <TextInput
-                            autoCorrect={false}
-                            clearTextOnFocus
-                            autoCapitalize="words"
-                            placeholder="Amount"
-                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-                          />
-                        </Pressable>
-
-                        <View style={[styles.menuItem,
-                          {
-                            width: Dimensions.get('window').width - 40,
-                            backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen,
-                            paddingLeft: 0,
-                            paddingRight: 0,
-                            paddingTop: 0,
-                          }]}
+                        <View style={{
+                          backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
+                        }}
                         >
-                          <Pressable
-                            style={[styles.servingSizeButton,
-                              { paddingRight: 30, backgroundColor: pawPink }]}
-                          >
-                            <Text style={[styles.servingSizeText, { paddingLeft: 10 }]}>
-                              cups
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Food Brand
                             </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Name"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                            />
                           </Pressable>
-                          <Pressable style={styles.servingSizeButton}>
-                            <Text style={styles.servingSizeText}>
-                              grams
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Food Type
                             </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Type"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                            />
                           </Pressable>
-                          <Pressable
-                            style={[styles.servingSizeButton,
-                              { paddingLeft: 40 }]}
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Serving
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Amount"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                            />
+                          </Pressable>
+
+                          <View style={[styles.menuItem,
+                            {
+                              width: Dimensions.get('window').width - 40,
+                              backgroundColor: pawGreen,
+                              paddingLeft: 0,
+                              paddingRight: 0,
+                              paddingTop: 0,
+                            }]}
                           >
-                            <Text style={[styles.servingSizeText, { paddingRight: 40 }]}>
-                              mL
+                            <Pressable
+                              style={[styles.servingSizeButton,
+                                { paddingRight: 30, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
+                            >
+                              <Text style={[styles.servingSizeText, { paddingLeft: 10 }]}>
+                                cups
+                              </Text>
+                            </Pressable>
+                            <Pressable style={styles.servingSizeButton}>
+                              <Text style={styles.servingSizeText}>
+                                grams
+                              </Text>
+                            </Pressable>
+                            <Pressable
+                              style={[styles.servingSizeButton,
+                                { paddingLeft: 40 }]}
+                            >
+                              <Text style={[styles.servingSizeText, { paddingRight: 40 }]}>
+                                mL
+                              </Text>
+                            </Pressable>
+                          </View>
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Meal Time
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Time"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                            />
+                          </Pressable>
+
+                          <Pressable style={[styles.menuItem,
+                            {
+                              width: Dimensions.get('window').width - 40,
+                              backgroundColor: pawGreen,
+                              flexDirection: 'column',
+                              height: 100,
+                              padding: 10,
+                              justifyContent: 'none',
+                            }]}
+                          >
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Dietary Restrictions
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Restrictions"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              multiline
+                              returnKeyType="done"
+                              onSubmitEditing={() => { Keyboard.dismiss(); }}
+                              style={[styles.menuText,
+                                {
+                                  fontSize: 22,
+                                  width: 'auto',
+                                  marginRight: Platform.OS === 'android' ? 20 : 0,
+                                  paddingTop: 10,
+                                }]}
+                            />
+                          </Pressable>
+
+                          <Pressable
+                            style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
+                            onPress={toggleMeal}
+                          >
+                            <Text
+                              style={styles.submittext}
+                            >
+                              Add Meal
                             </Text>
                           </Pressable>
                         </View>
-
-                        <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawGreen }]}>
-                          <Text
-                            style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawGrey : pawWhite }]}
-                          >
-                            Meal Time
-                          </Text>
-                          <TextInput
-                            autoCorrect={false}
-                            clearTextOnFocus
-                            autoCapitalize="words"
-                            placeholder="Time"
-                            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-                            style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
-                          />
-                        </Pressable>
-
-                        <Pressable
-                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
-                          onPress={toggleMeal}
-                        >
-                          <Text
-                            style={styles.submittext}
-                          >
-                            Add Meal
-                          </Text>
-                        </Pressable>
-                      </View>
+                      </KeyboardAvoidingView>
                     </Modal>
 
                     <Pressable
@@ -622,7 +742,7 @@ export default function PetCard({ pet }) {
                         numberOfLines={1}
                         adjustsFontSizeToFit
                       >
-                        Add Vaccine Information
+                        Add Vaccination Information
                       </Text>
                     </Pressable>
 
@@ -642,13 +762,13 @@ export default function PetCard({ pet }) {
                         { catDog === 'dog' ? (displayDogVaccines()) : (displayCatVaccines())}
 
                         <Pressable
-                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
                           onPress={toggleMedical}
                         >
                           <Text
                             style={styles.submittext}
                           >
-                            Add Vaccines
+                            Add Vaccination
                           </Text>
                         </Pressable>
                       </View>

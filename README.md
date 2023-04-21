@@ -29,6 +29,7 @@
 
 ## About The Project
 Paw5 is an app that helps organize all facets of pet ownership neatly into five categories: Health, Map, Community, Services and News. With the app, users will be able to monitor their pets and delve into the pet community around them. From boarding during travel, finding dog-friendly places to hang out, or even updating your neighbors and friends on information about your pets, Paw5 aims to be the go-to pet app on every pet lovers phone!
+<br />
 <img src="assets/paw5features.png" alt="Features" height="500">
 <br />
 <br />

@@ -1,5 +1,5 @@
 import {
-  View, Text, Pressable, Linking, TextInput,
+  View, Text, Pressable, Linking, TextInput, Image, Platform, Dimensions,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -15,6 +15,11 @@ import dstyles, { pawYellow } from '../constants/DarkStyles';
 import lightMap from '../constants/lightMap.json';
 import darkMap from '../constants/darkMap.json';
 import Loader from './Loader';
+import MapLocation from '../components/mapLocation';
+
+const mapPin = require('../../assets/map_pin_s.png');
+const noPetF = require('../../assets/notPetFriendly.png');
+const PetF = require('../../assets/petFriendly.png');
 
 const StatusBarHeight = getStatusBarHeight();
 
@@ -35,7 +40,21 @@ export default function MapTab() {
       setReviewVisible(!isReviewVisible);
     }
   };
-
+  const [isNewLocVisible, setNewLocVisible] = useState(false);
+  const toggleNewLoc = () => {
+    setNewLocVisible(!isNewLocVisible);
+    if (isNewLocVisible) {
+      setNewLocVisible(!isNewLocVisible);
+    }
+  };
+  const [newLoc, setNewLoc] = useState({});
+  const [coordsNow, setCoords] = useState([]);
+  const [locNow, setLoc] = useState([]);
+  const [descNow, setDesc] = useState([]);
+  const [rateNow, setRate] = useState([]);
+  const [pfNow, setPF] = useState([]);
+  const [eorw, seteorw] = useState([]);
+  const [nors, setnors] = useState([]);
   const [isChecked1, setChecked1] = useState(false);
   const [isChecked2, setChecked2] = useState(false);
   const [isChecked3, setChecked3] = useState(false);
@@ -44,13 +63,44 @@ export default function MapTab() {
 
   const [isCheckedx, setCheckedx] = useState(false);
   const [isCheckedcheck, setCheckedcheck] = useState(false);
+  const [isLocationVisible, setLocationVisible] = useState(false);
+
+  const updateNewLoc = (key, value) => {
+    const newLocEntry = newLoc;
+    newLocEntry[key] = value;
+    setNewLoc(newLocEntry);
+  };
 
   const openmap = () => {
     setReviewVisible(!isReviewVisible);
     if (isReviewVisible) {
       setReviewVisible(!isReviewVisible);
     }
-    Linking.openURL('https://www.google.com/maps/place/Denton,+TX/@32.9972427,-96.3332429,15z/data=!4m6!3m5!1s0x864c4ca0c088b1d1:0x724474cb4814fb1b!8m2!3d33.2148412!4d-97.1330683!16zL20vMDEwMDE2');
+    setLocationVisible(!isLocationVisible);
+    if (isLocationVisible) {
+      setLocationVisible(!isLocationVisible);
+    }
+    Linking.openURL(`https://www.google.com/maps/place/${Math.abs(Math.trunc(coordsNow[0]))}%C2%B0${Math.abs(Math.trunc((coordsNow[0] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[0] % 1) * 60) % 1) * 60))}%22${nors}+${Math.abs(Math.trunc(coordsNow[1]))}%C2%B0${Math.abs(Math.trunc((coordsNow[1] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[1] % 1) * 60) % 1) * 60))}%22${eorw}/@${coordsNow[0]},${coordsNow[1]}`);
+  };
+
+  const toggleLocation = (coords, loc, desc, rate, pf) => {
+    setLocationVisible(!isLocationVisible);
+    setCoords(coords);
+    setLoc(loc);
+    setDesc(desc);
+    setRate(rate);
+    setPF(pf);
+    seteorw('W');
+    if (coords[1] > 0) {
+      seteorw('E');
+    }
+    setnors('S');
+    if (coords[0] > 0) {
+      setnors('N');
+    }
+    if (isLocationVisible) {
+      setLocationVisible(!isLocationVisible);
+    }
   };
 
   return (
@@ -59,10 +109,7 @@ export default function MapTab() {
       <Loader show={initialLocation.loaded}>
         <View style={styles.containerMap}>
           <View>
-            <Pressable style={{ backgroundColor: '#FFFFF' }} onPress={openmap}>
-              {/* //'maps://app?saddr=Denton&Texas')}> */}
-              <Text />
-            </Pressable>
+
             <MapView
               style={styles.map}
               customMapStyle={isDarkMode === 'light' ? darkMap : lightMap}
@@ -71,12 +118,23 @@ export default function MapTab() {
               followsUserLocation
               region={initialLocation}
               initialRegion={initialLocation}
-            />
+            >
+              <MapLocation pressAction={() => toggleLocation([33.213215, -97.1521454], 'Hi Grae c:', 'Demo Description', 4.4, true)} />
+            </MapView>
 
           </View>
         </View>
         <View style={[styles.search, { position: 'absolute', top: StatusBarHeight }]}>
           <SearchBar />
+        </View>
+        <View style={styles.search}>
+          <Pressable style={[styles.filters, { left: Dimensions.get('window').width - 100, bottom: Platform.OS === 'ios' ? 73 : 68 }]} onPress={() => setNewLocVisible(true)}>
+            <Feather
+              name="plus"
+              size={20}
+              color={pawGrey}
+            />
+          </Pressable>
         </View>
       </Loader>
       <Modal
@@ -99,7 +157,10 @@ export default function MapTab() {
               Hey, [username]!
             </Text>
             <Text style={[styles.filterText, { textAlign: 'center', fontSize: 15 }]}>
-              How was [location name]?
+              How was
+              {' '}
+              {locNow}
+              ?
             </Text>
             <View style={{
               flexDirection: 'row', flex: 1, margin: 5, alignSelf: 'center', marginTop: 10,
@@ -248,6 +309,197 @@ export default function MapTab() {
             </Text>
           </View>
         </View>
+      </Modal>
+      <Modal
+        isVisible={isLocationVisible}
+        animationType="slide"
+        hasBackdrop={false}
+        onBackdropPress={() => {
+          setLocationVisible(!isLocationVisible);
+        }}
+        onRequestClose={() => {
+          setLocationVisible(!isLocationVisible);
+        }}
+
+      >
+        <View
+          showsVerticalScrollIndicator={false}
+          style={styles.locationPopup}
+        >
+
+          <View style={{ flexDirection: 'row' }}>
+            <Pressable
+              onPress={toggleLocation}
+              style={{ alignSelf: 'flex-start', margin: 10 }}
+            >
+              <Feather
+                name="chevron-left"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+            <Image
+              style={styles.locationImage}
+              source={mapPin}
+            />
+
+          </View>
+          <Text style={styles.locationName}>{locNow}</Text>
+          <Text style={styles.locationDesc} numberOfLines={5}>
+            {descNow}
+            {' '}
+            {'\n\n\n\n'}
+          </Text>
+          <View>
+            <Feather
+              name="star"
+              size={40}
+              color={rateNow <= 1 ? pawWhite : pawYellow}
+              style={styles.locStar1}
+            />
+            <Feather
+              name="star"
+              size={40}
+              color={rateNow <= 2 ? pawWhite : pawYellow}
+              style={styles.locStar2}
+            />
+            <Feather
+              name="star"
+              size={40}
+              color={rateNow <= 3 ? pawWhite : pawYellow}
+              style={styles.locStar3}
+            />
+            <Feather
+              name="star"
+              size={40}
+              color={rateNow <= 4 ? pawWhite : pawYellow}
+              style={styles.locStar4}
+            />
+            <Feather
+              name="star"
+              size={40}
+              color={rateNow === 5 ? pawYellow : pawWhite}
+              style={styles.locStar5}
+            />
+          </View>
+          <Image
+            source={pfNow === true ? PetF : noPetF}
+            style={{
+              height: 120, width: 120, margin: 10, marginLeft: 30,
+            }}
+          />
+          <Pressable
+            style={[styles.navButton, { justifyContent: 'center' }]}
+            onPress={openmap}
+          >
+            <Text style={styles.navigateMsg}>
+              Navigate
+              {'     '}
+              {'>'}
+            </Text>
+          </Pressable>
+        </View>
+
+      </Modal>
+      <Modal
+        isVisible={isNewLocVisible}
+        animationType="slide"
+        hasBackdrop={false}
+      >
+        <View
+          showsVerticalScrollIndicator={false}
+          style={styles.locationPopup}
+        >
+
+          <View style={{ flexDirection: 'row' }}>
+            <Pressable
+              onPress={toggleNewLoc}
+              style={{ alignSelf: 'flex-start', margin: 10 }}
+            >
+              <Feather
+                name="chevron-left"
+                size={30}
+                color={pawGrey}
+                style={styles.settingsExitButton}
+              />
+            </Pressable>
+            <Pressable style={{
+              jusifyContent: 'center', top: 10, alignContent: 'center', backgroundColor: pawWhite, borderRadius: 50, height: 55, width: Dimensions.get('window').width / 1.4,
+            }}
+            >
+              <TextInput
+                clearTextOnFocus
+                autoCapitalize="words"
+                placeholder="Location Name"
+                placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                style={[styles.navigateMsg, {
+                  fontSize: 22, textAlign: 'center', textAlignVertical: 'center', width: 'auto',
+                }]}
+                onChangeText={(text) => updateNewLoc('location_name', text)}
+              />
+            </Pressable>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+            <Pressable style={{
+              jusifyContent: 'center', top: 10, marginRight: 10, alignContent: 'center', backgroundColor: pawWhite, borderRadius: 50, height: 55, width: Dimensions.get('window').width / 2.5,
+            }}
+            >
+              <TextInput
+                clearTextOnFocus
+                autoCapitalize="words"
+                placeholder="Latitude"
+                placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                style={[styles.navigateMsg, {
+                  fontSize: 22, textAlign: 'center', textAlignVertical: 'center', width: 'auto',
+                }]}
+                onChangeText={(text) => updateNewLoc('lat', text)}
+              />
+            </Pressable>
+            <Pressable style={{
+              jusifyContent: 'center', top: 10, marginRight: 10, alignContent: 'center', backgroundColor: pawWhite, borderRadius: 50, height: 55, width: Dimensions.get('window').width / 2.5,
+            }}
+            >
+              <TextInput
+                clearTextOnFocus
+                autoCapitalize="words"
+                placeholder="Latitude"
+                placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                style={[styles.navigateMsg, {
+                  fontSize: 22, textAlign: 'center', textAlignVertical: 'center', width: 'auto',
+                }]}
+                onChangeText={(text) => updateNewLoc('lon', text)}
+              />
+            </Pressable>
+          </View>
+          <View style={{ marginTop: 15, flexDirection: 'row', justifyContent: 'center' }}>
+            <Pressable style={{
+              jusifyContent: 'center', top: 10, marginRight: 10, alignContent: 'center', backgroundColor: pawWhite, borderRadius: 30, height: (Dimensions.get('window').height / 6) * (2.6 / 3.13), width: Dimensions.get('window').width - 40,
+            }}
+            >
+              <TextInput
+                clearTextOnFocus
+                autoCapitalize="words"
+                placeholder="Location Description"
+                placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
+                style={[styles.navigateMsg, {
+                  fontSize: 18, paddingLeft: 15, textAlign: 'left', width: 'auto',
+                }]}
+                onChangeText={(text) => updateNewLoc('lat', text)}
+              />
+            </Pressable>
+          </View>
+          <Pressable
+            style={[styles.newLocSubmit, { marginTop: 15, alignSelf: 'center', justifyContent: 'center' }]}
+            onPress={toggleNewLoc}
+          >
+            <Text style={[styles.navigateMsg, { textAlign: 'center' }]}>
+              Submit
+              {'   >'}
+            </Text>
+          </Pressable>
+        </View>
+
       </Modal>
     </View>
   );

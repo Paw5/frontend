@@ -88,7 +88,7 @@ class Network {
     }
   };
 
-  delete = async (host: string, body: {}, options: AxiosRequestConfig) => {
+  delete = async (host: string, options?: AxiosRequestConfig) => {
     const loginToken = await AsyncStorage.getItem('@loginToken');
     this.request = {
       method: 'DELETE',
@@ -100,10 +100,9 @@ class Network {
         },
         ...options,
       },
-      body
     };
     try {
-      const response = await axios.post(API_ENDPOINT + host, body, this.request.options);
+      const response = await axios.delete(API_ENDPOINT + host, this.request.options);
       this.response = new NetworkResponse(response);
     return this.response;
     } catch(e) {

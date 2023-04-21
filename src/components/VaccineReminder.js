@@ -43,7 +43,7 @@ export default function VaccineReminder({ pets }) {
   };
 
   const [areVaccinesLoaded, setVaccinesLoaded] = useState(false);
-  const [setCurrentVaccinations] = useState([]);
+  const [currentVaccinations, setCurrentVaccinations] = useState([]);
 
   const openStatus = () => {
     setVaccinesLoaded(false);
@@ -56,18 +56,21 @@ export default function VaccineReminder({ pets }) {
   // eslint-disable-next-line consistent-return
   function displayVaccineList() {
     if (currentPet) {
-      // if (!areVaccinesLoaded) {
-      //   _.get('vaccinations', {
-      //     params: {
-      //       pet_id: currentPet.pet_id,
-      //     },
-      //   }).then((results) => {
-      //     const vaccinations = results.data().results;
+      console.log(currentPet);
+      if (!areVaccinesLoaded) {
+        console.log('loading vaccines');
+        _.get('vaccinations', {
+          params: {
+            pet_id: currentPet.pet_id,
+          },
+        }).then((results) => {
+          const vaccinations = results.data().results;
 
-      //     setCurrentVaccinations(vaccinations);
-      //     setVaccinesLoaded(true);
-      //   });
-      // }
+          setCurrentVaccinations(vaccinations);
+          setVaccinesLoaded(true);
+          console.log(vaccinations);
+        });
+      }
 
       if (currentPet.type === 'dog') {
         return (

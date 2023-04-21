@@ -5,7 +5,7 @@ import {
   Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Collapsible from '@eliav2/react-native-collapsible-view';
@@ -13,11 +13,13 @@ import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datep
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import * as Calendar from 'expo-calendar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from 'react-native-modal';
 import lstyles, { pawPink, pawWhite, pawGrey } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
+import { setCalendarID } from '../redux/CalendarSlice';
 import PetCard from '../components/PetCard';
-// import HealthComponent from '../components/HealthComponent';
 import UpcomingAppointments from '../components/UpcomingAppointments';
 import WalkGraph from '../components/WalkGraph';
 import WalkGoals from '../components/WalkGoals';
@@ -36,7 +38,16 @@ const emptyList = [];
 
 const _ = Network();
 
+let newID = '';
+
+async function getCurrentCalendar() {
+  const existingCalendar = await AsyncStorage.getItem('@calendarID');
+  newID = existingCalendar;
+  return existingCalendar;
+}
+
 export default function HealthTab() {
+  const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
   const [hasLoadedPets, setHasLoadedPets] = useState(false);
   const [petCards, setPetCards] = useState(() => []);
@@ -44,6 +55,17 @@ export default function HealthTab() {
   const [userId, setUserId] = useState(0);
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
   const [formEntry, setFormEntry] = useState({});
+  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === 'granted' && defaultCalendar === 'none') {
+        await getCurrentCalendar();
+        dispatch(setCalendarID(newID));
+      }
+    })();
+  }, []);
 
   if (!userId) {
     _.get('login').then((response) => {
@@ -69,17 +91,42 @@ export default function HealthTab() {
     setAddVisible(!isAddVisible);
   };
 
-  const addPetToDB = async () => {
-    const networkResponse = await _.post(`pets/${userId}`, formEntry);
-    networkResponse.onSuccess(() => {
-      setFormEntry({});
-    });
-  };
-
   const updateFormEntry = (key, value) => {
     const newFormEntry = formEntry;
     newFormEntry[key] = value;
     setFormEntry(newFormEntry);
+  };
+
+  function addDay(date) {
+    const endDay = new Date(date);
+    return endDay.setDate(endDay.getDate() + 1);
+  }
+
+  async function addBirthdayToCalendar(petInfo) {
+    const event = new Date(petInfo.custom_info);
+    const yearsOld = (event).getFullYear();
+    console.log(yearsOld);
+
+    const newEvent = {
+      title: `${petInfo.pet_name}'s Birthday`,
+      startDate: new Date(petInfo.custom_info),
+      endDate: new Date(addDay(petInfo.custom_info)),
+      allDay: (true),
+      recurrenceRule: {
+        frequency: Calendar.Frequency.YEARLY,
+      },
+    };
+
+    // const eventID = await Calendar.createEventAsync(defaultCalendar, newEvent);
+    // updateFormEntry('event_id', eventID);
+  }
+
+  const addPetToDB = async () => {
+    // const networkResponse = await _.post(`pets/${userId}`, formEntry);
+    // networkResponse.onSuccess(() => {
+    addBirthdayToCalendar(formEntry);
+    //   setFormEntry({});
+    // });
   };
 
   const [selectedItem, setSelectedItem] = useState('Select Breed');
@@ -154,7 +201,9 @@ export default function HealthTab() {
           >
 
             <View style={styles.transparentBG}>
-              <Pressable style={styles.petCard} onPress={toggleAdd}>
+              <Pressable
+                style={styles.petCard}
+              >
                 <Feather
                   name="home"
                   size={80}

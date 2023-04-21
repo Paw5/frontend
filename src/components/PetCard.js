@@ -43,6 +43,11 @@ export default function PetCard({ pet }) {
   const [selectedVaccine, setSelectedVaccine] = useState('Select Vaccination');
   const [itemList, setAnimal] = useState(emptyList);
   const [formEntry, setFormEntry] = useState({});
+  const [formMealEntry, setMealFormEntry] = useState({});
+  const [isCupsSelected, setCupsSelected] = useState(false);
+  const [isGramsSelected, setGramsSelected] = useState(false);
+  const [ismLSelected, setmLSelected] = useState(false);
+  const [mealRestrictions, setMealRestrcitions] = useState('');
   const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Paraiflueza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
@@ -66,6 +71,12 @@ export default function PetCard({ pet }) {
     const newFormEntry = formEntry;
     newFormEntry[key] = value;
     setFormEntry(newFormEntry);
+  };
+
+  const updateMealFormEntry = (key, value) => {
+    const newMealFormEntry = formMealEntry;
+    newMealFormEntry[key] = value;
+    setMealFormEntry(newMealFormEntry);
   };
 
   useEffect(() => {
@@ -94,6 +105,11 @@ export default function PetCard({ pet }) {
     showVaccineAdded(!vaccineAdded);
   };
 
+  const [mealAdded, showMealAdded] = useState(false);
+  const toggleAddMeal = () => {
+    showMealAdded(!mealAdded);
+  };
+
   const [isMealVisible, showAddMeal] = useState(false);
   const toggleMeal = () => {
     showAddMeal(!isMealVisible);
@@ -119,11 +135,25 @@ export default function PetCard({ pet }) {
   };
 
   const addVaccineToPet = async () => {
-    console.log(formEntry);
+    updateFormEntry('time', new Date(formEntry.time));
     const networkResponse = await _.post(`vaccinations/${petID}`, formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
       toggleAddVaccine();
+    });
+  };
+
+  const addMealToPet = async () => {
+    const networkResponse = await _.post(`vaccinations/${petID}`, formMealEntry);
+    networkResponse.onSuccess(() => {
+      setMealFormEntry({});
+    });
+  };
+
+  const addRestrictionsToPet = async () => {
+    const networkResponse = await _.post(`vaccinations/${petID}`, mealRestrictions);
+    networkResponse.onSuccess(() => {
+      setMealRestrcitions('');
     });
   };
 
@@ -142,7 +172,22 @@ export default function PetCard({ pet }) {
         style={{ borderRadius: 50, overflow: 'hidden' }}
         confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
       />
-    ));
+    )).onClientError((error) => {
+      console.log(error);
+    });
+  };
+
+  const createMealInfo = () => {
+    if (isCupsSelected) {
+      updateMealFormEntry('serving_measurement', 'cups');
+    } else if (isGramsSelected) {
+      updateMealFormEntry('serving_measurement', 'grams');
+    } else if (ismLSelected) {
+      updateMealFormEntry('serving_measurement', 'mL');
+    }
+
+    addMealToPet();
+    addRestrictionsToPet();
   };
 
   const displayDogVaccines = () => (
@@ -217,9 +262,8 @@ export default function PetCard({ pet }) {
             selected={getToday()}
             mode="calendar"
             onSelectedChange={(date) => {
-              updateFormEntry('time', new Date(date));
+              updateFormEntry('time', date);
               setSelectedDate(getFormatedDate(date, 'M/D/YY'));
-              console.log(new Date(selectedDate));
             }}
           />
         </Modal>
@@ -363,6 +407,20 @@ export default function PetCard({ pet }) {
       </Pressable>
     </View>
   );
+
+  const servingSizeSelector = (id) => {
+    setCupsSelected(false);
+    setGramsSelected(false);
+    setmLSelected(false);
+
+    if (id === 0) {
+      setCupsSelected(true);
+    } else if (id === 1) {
+      setGramsSelected(true);
+    } else {
+      setmLSelected(true);
+    }
+  };
 
   return (
 
@@ -624,6 +682,7 @@ export default function PetCard({ pet }) {
                               placeholder="Name"
                               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
                               style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('brand_name', text)}
                             />
                           </Pressable>
 
@@ -640,6 +699,7 @@ export default function PetCard({ pet }) {
                               placeholder="Type"
                               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
                               style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('type', text)}
                             />
                           </Pressable>
 
@@ -656,6 +716,7 @@ export default function PetCard({ pet }) {
                               placeholder="Amount"
                               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
                               style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('serving_amount', text)}
                             />
                           </Pressable>
 
@@ -670,20 +731,39 @@ export default function PetCard({ pet }) {
                           >
                             <Pressable
                               style={[styles.servingSizeButton,
-                                { paddingRight: 30, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
+                                {
+                                  paddingRight: 30,
+                                  // eslint-disable-next-line no-nested-ternary
+                                  backgroundColor: isCupsSelected
+                                    ? (pawPink) : (pawGreen),
+                                }]}
+                              onPress={() => { servingSizeSelector(0); }}
                             >
                               <Text style={[styles.servingSizeText, { paddingLeft: 10 }]}>
                                 cups
                               </Text>
                             </Pressable>
-                            <Pressable style={styles.servingSizeButton}>
+                            <Pressable
+                              style={[styles.servingSizeButton, {
+                                // eslint-disable-next-line no-nested-ternary
+                                backgroundColor: isGramsSelected
+                                  ? (pawPink) : (pawGreen),
+                              }]}
+                              onPress={() => { servingSizeSelector(1); }}
+                            >
                               <Text style={styles.servingSizeText}>
                                 grams
                               </Text>
                             </Pressable>
                             <Pressable
                               style={[styles.servingSizeButton,
-                                { paddingLeft: 40 }]}
+                                {
+                                  paddingLeft: 40,
+                                  // eslint-disable-next-line no-nested-ternary
+                                  backgroundColor: ismLSelected
+                                    ? (pawPink) : (pawGreen),
+                                }]}
+                              onPress={() => { servingSizeSelector(2); }}
                             >
                               <Text style={[styles.servingSizeText, { paddingRight: 40 }]}>
                                 mL
@@ -701,9 +781,10 @@ export default function PetCard({ pet }) {
                               autoCorrect={false}
                               clearTextOnFocus
                               autoCapitalize="words"
-                              placeholder="Time"
+                              placeholder="Times per Day"
                               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
                               style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('time', text)}
                             />
                           </Pressable>
 
@@ -738,12 +819,16 @@ export default function PetCard({ pet }) {
                                   marginRight: Platform.OS === 'android' ? 20 : 0,
                                   paddingTop: 10,
                                 }]}
+                              onChangeText={(text) => setMealRestrcitions(text)}
                             />
                           </Pressable>
 
                           <Pressable
                             style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
-                            onPress={toggleMeal}
+                            onPress={() => {
+                              toggleAddMeal();
+                              createMealInfo();
+                            }}
                           >
                             <Text
                               style={styles.submittext}
@@ -751,6 +836,22 @@ export default function PetCard({ pet }) {
                               Add Meal
                             </Text>
                           </Pressable>
+
+                          <AwesomeAlert
+                            show={mealAdded}
+                            title="Meal Added!"
+                            confirmText="Yay!"
+                            titleStyle={styles.alertText}
+                            contentContainerStyle={styles.alertBackground}
+                            showConfirmButton
+                            confirmButtonTextStyle={styles.confirmButton}
+                            onConfirmPressed={() => {
+                              toggleAddMeal();
+                              toggleMeal();
+                            }}
+                            style={{ borderRadius: 50, overflow: 'hidden' }}
+                            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                          />
                         </View>
                       </KeyboardAvoidingView>
                     </Modal>

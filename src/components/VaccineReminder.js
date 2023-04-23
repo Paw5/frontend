@@ -56,19 +56,17 @@ export default function VaccineReminder({ pets }) {
   // eslint-disable-next-line consistent-return
   function displayVaccineList() {
     if (currentPet) {
-      console.log(currentPet);
       if (!areVaccinesLoaded) {
-        console.log('loading vaccines');
         _.get('vaccinations', {
           params: {
             pet_id: currentPet.pet_id,
           },
         }).then((results) => {
           const vaccinations = results.data().results;
+          console.log(vaccinations);
 
           setCurrentVaccinations(vaccinations);
           setVaccinesLoaded(true);
-          console.log(vaccinations);
         });
       }
 

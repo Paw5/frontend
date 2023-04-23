@@ -7,12 +7,14 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
+import * as Calendar from 'expo-calendar';
 import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Collapsible from '@eliav2/react-native-collapsible-view';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { setHasLoaded } from '../redux/CardLoaderSlice';
 import lstyles, {
   pawPink, pawWhite, pawGrey,
 } from '../constants/Styles';
@@ -31,6 +33,7 @@ const emptyList = [];
 const _ = Network();
 
 export default function PetCard({ pet }) {
+  const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const {
@@ -100,6 +103,8 @@ export default function PetCard({ pet }) {
     showPetRemoved(!petRemoved);
   };
 
+  const [deleteSuccess, showDeleteSuccess] = useState(false);
+
   const [vaccineAdded, showVaccineAdded] = useState(false);
   const toggleAddVaccine = () => {
     showVaccineAdded(!vaccineAdded);
@@ -126,16 +131,21 @@ export default function PetCard({ pet }) {
     setDateVisible(!isDateVisible);
   };
 
-  const [removeSuccess] = useState(false);
-
   const closeAll = () => {
+    showDeleteSuccess(false);
     showPetEdited(false);
     setEditVisible(false);
     showPetRemoved(false);
   };
 
+  function resetVaccineForm() {
+    setSelectedDate(getFormatedDate(getToday(), 'M/D/YY'));
+    setSelectedVaccine('Select Vaccination');
+  }
+
   const addVaccineToPet = async () => {
     updateFormEntry('time', new Date(formEntry.time));
+    resetVaccineForm();
     const networkResponse = await _.post(`vaccinations/${petID}`, formEntry);
     networkResponse.onSuccess(() => {
       setFormEntry({});
@@ -157,23 +167,24 @@ export default function PetCard({ pet }) {
     });
   };
 
+  function resetScreen() {
+    showPetRemoved(false);
+    showDeleteSuccess(true);
+  }
+
+  async function deleteBirthdayFromCalendar(event) {
+    console.log(event);
+    console.log(typeof event);
+    await Calendar.deleteEventAsync(event, { futureEvents: true });
+  }
+
   const removePetFromDB = async () => {
+    console.log(pet);
+    deleteBirthdayFromCalendar(pet.event_id);
     const networkResponse = await _.delete(`pets/${userId}/${petID}`);
-    networkResponse.onSuccess(() => (
-      <AwesomeAlert
-        show={removeSuccess}
-        title="Pet Deleted!"
-        confirmText="Yay!"
-        titleStyle={styles.alertText}
-        contentContainerStyle={styles.alertBackground}
-        showConfirmButton
-        confirmButtonTextStyle={styles.confirmButton}
-        onConfirmPressed={closeAll}
-        style={{ borderRadius: 50, overflow: 'hidden' }}
-        confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
-      />
-    )).onClientError((error) => {
-      console.log(error);
+    networkResponse.onSuccess(() => {
+      dispatch(setHasLoaded(false));
+      resetScreen();
     });
   };
 
@@ -217,7 +228,7 @@ export default function PetCard({ pet }) {
             itemStyle={styles.dropdown}
             selectedValue={selectedVaccine}
             onValueChange={(index) => {
-              updateFormEntry('name', index);
+              updateFormEntry('vaccine_name', index);
               setSelectedVaccine(index);
             }}
           >
@@ -327,7 +338,7 @@ export default function PetCard({ pet }) {
             selectedValue={selectedVaccine}
             onValueChange={(index) => {
               setSelectedVaccine(index);
-              updateFormEntry('name', index);
+              updateFormEntry('vaccine_name', index);
             }}
           >
             {catVaccinations.map((value) => (
@@ -971,6 +982,19 @@ export default function PetCard({ pet }) {
           </Pressable>
 
           <AwesomeAlert
+            show={deleteSuccess}
+            title="Pet Deleted!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeAll}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
+
+          <AwesomeAlert
             show={petRemoved}
             title="Are you sure?"
             confirmText="Cancel"
@@ -982,7 +1006,7 @@ export default function PetCard({ pet }) {
             confirmButtonTextStyle={styles.confirmButton}
             cancelButtonTextStyle={styles.confirmButton}
             onConfirmPressed={toggleRemove}
-            onCancelPressed={removePetFromDB}
+            onCancelPressed={() => { toggleRemove(); removePetFromDB(); }}
             style={{ borderRadius: 50, overflow: 'hidden' }}
             confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
             cancelButtonColor={isDarkMode === 'light' ? '#d94545' : '#b81d1d'}

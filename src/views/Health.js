@@ -19,6 +19,7 @@ import Modal from 'react-native-modal';
 import lstyles, { pawPink, pawWhite, pawGrey } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
 import { setCalendarID } from '../redux/CalendarSlice';
+import { setHasLoaded } from '../redux/CardLoaderSlice';
 import PetCard from '../components/PetCard';
 import UpcomingAppointments from '../components/UpcomingAppointments';
 import WalkGraph from '../components/WalkGraph';
@@ -49,13 +50,13 @@ async function getCurrentCalendar() {
 export default function HealthTab() {
   const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
-  const [hasLoadedPets, setHasLoadedPets] = useState(false);
   const [petCards, setPetCards] = useState(() => []);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const [userId, setUserId] = useState(0);
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
   const [formEntry, setFormEntry] = useState({});
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+  const hasLoaded = useSelector((state) => state.cardLoader.hasLoaded);
 
   useEffect(() => {
     (async () => {
@@ -103,10 +104,6 @@ export default function HealthTab() {
   }
 
   async function addBirthdayToCalendar(petInfo) {
-    const event = new Date(petInfo.custom_info);
-    const yearsOld = (event).getFullYear();
-    console.log(yearsOld);
-
     const newEvent = {
       title: `${petInfo.pet_name}'s Birthday`,
       startDate: new Date(petInfo.custom_info),
@@ -117,22 +114,42 @@ export default function HealthTab() {
       },
     };
 
-    // const eventID = await Calendar.createEventAsync(defaultCalendar, newEvent);
-    // updateFormEntry('event_id', eventID);
+    updateFormEntry('event_id', await Calendar.createEventAsync(defaultCalendar, newEvent));
   }
-
-  const addPetToDB = async () => {
-    // const networkResponse = await _.post(`pets/${userId}`, formEntry);
-    // networkResponse.onSuccess(() => {
-    addBirthdayToCalendar(formEntry);
-    //   setFormEntry({});
-    // });
-  };
 
   const [selectedItem, setSelectedItem] = useState('Select Breed');
   const [animalValue, setAnimalValue] = useState('Select Animal');
   const [itemList, setAnimal] = useState(emptyList);
   const [autofillText, setAutofillText] = useState('');
+  const [cardIndex, setCardIndex] = useState(0);
+  const [selectedPet, setSelectedPet] = useState(petCards[0]);
+
+  const scrollX = new Animated.Value(0);
+  scrollX.addListener(({ value }) => {
+    setCardIndex(Math.round(value / 390));
+    setSelectedPet(petCards[cardIndex - 1]);
+  });
+  scrollX.removeListener();
+
+  function resetAddForm() {
+    setSelectedDate(getFormatedDate(getToday(), 'MM/DD/YYYY'));
+    setSelectedItem('Select Breed');
+    setAnimalValue('Select Animal');
+    setAnimal(emptyList);
+    setAutofillText('');
+  }
+
+  const addPetToDB = async () => {
+    addBirthdayToCalendar(formEntry);
+
+    const networkResponse = await _.post(`pets/${userId}`, formEntry);
+    networkResponse.onSuccess(() => {
+      console.log(formEntry);
+      console.log(typeof formEntry.event_id);
+      resetAddForm();
+      setFormEntry({});
+    });
+  };
 
   /* toggle date modal */
   const [isDateVisible, setDateVisible] = useState(false);
@@ -143,10 +160,10 @@ export default function HealthTab() {
   const closeAll = () => {
     showPetAdded(false);
     setAddVisible(false);
-    setHasLoadedPets(false);
+    dispatch(setHasLoaded(false));
   };
 
-  if (userId && !hasLoadedPets) {
+  if (userId && !hasLoaded) {
     _.get('pets', {
       params: {
         user_id: userId,
@@ -155,19 +172,9 @@ export default function HealthTab() {
       const pets = results.data().results;
 
       setPetCards(pets);
-      setHasLoadedPets(true);
+      dispatch(setHasLoaded(true));
     });
   }
-
-  const [cardIndex, setCardIndex] = useState(0);
-  const [selectedPet, setSelectedPet] = useState(petCards[0]);
-
-  const scrollX = new Animated.Value(0);
-  scrollX.addListener(({ value }) => {
-    setCardIndex(Math.round(value / 390));
-    setSelectedPet(petCards[cardIndex - 1]);
-  });
-  scrollX.removeListener();
 
   return (
 

@@ -2,7 +2,7 @@ import {
   View, Text, Pressable, Linking, TextInput, Image, Platform, Dimensions,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MapView from 'react-native-maps';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
 import Modal from 'react-native-modal';
@@ -16,6 +16,8 @@ import lightMap from '../constants/lightMap.json';
 import darkMap from '../constants/darkMap.json';
 import Loader from './Loader';
 import MapLocation from '../components/mapLocation';
+import Network from '../util/Network';
+import { setHasLoaded } from '../redux/LocationLoaderSlice';
 
 const mapPin = require('../../assets/map_pin_s.png');
 const noPetF = require('../../assets/notPetFriendly.png');
@@ -24,6 +26,7 @@ const PetF = require('../../assets/petFriendly.png');
 const StatusBarHeight = getStatusBarHeight();
 
 export default function MapTab() {
+  const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const initialLocation = useSelector((state) => state.location.region);
@@ -47,6 +50,9 @@ export default function MapTab() {
       setNewLocVisible(!isNewLocVisible);
     }
   };
+
+  const _ = Network();
+
   const [newLoc, setNewLoc] = useState({});
   const [coordsNow, setCoords] = useState([]);
   const [locNow, setLoc] = useState([]);
@@ -61,13 +67,26 @@ export default function MapTab() {
   const [isChecked4, setChecked4] = useState(false);
   const [isChecked5, setChecked5] = useState(false);
 
+  const [locPins, setLocPins] = useState(() => []);
+
   const [isCheckedx, setCheckedx] = useState(false);
   const [isCheckedcheck, setCheckedcheck] = useState(false);
   const [isLocationVisible, setLocationVisible] = useState(false);
+  const hasLoaded = useSelector((state) => state.locationLoader.hasLoaded);
 
   const updateNewLoc = (key, value) => {
     const newLocEntry = newLoc;
-    newLocEntry[key] = value;
+    newLocEntry.rating = 0;
+    newLocEntry.pet_friendly = true;
+    newLocEntry.coords[0] = [];
+    newLocEntry.coords[1] = [];
+    if (key !== 'lat' && key !== 'lon') {
+      newLocEntry[key] = value;
+    } else if (key === 'lat') {
+      newLocEntry.coords[0] = value;
+    } else {
+      newLocEntry.coords[1] = value;
+    }
     setNewLoc(newLocEntry);
   };
 
@@ -83,8 +102,26 @@ export default function MapTab() {
     Linking.openURL(`https://www.google.com/maps/place/${Math.abs(Math.trunc(coordsNow[0]))}%C2%B0${Math.abs(Math.trunc((coordsNow[0] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[0] % 1) * 60) % 1) * 60))}%22${nors}+${Math.abs(Math.trunc(coordsNow[1]))}%C2%B0${Math.abs(Math.trunc((coordsNow[1] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[1] % 1) * 60) % 1) * 60))}%22${eorw}/@${coordsNow[0]},${coordsNow[1]}`);
   };
 
+  const addLocToDB = async () => {
+    const networkResponse = await _.post('locations', newLoc);
+    networkResponse.onSuccess(() => {
+      // resetAddForm();
+      setNewLoc({});
+    });
+  };
+
+  if (!hasLoaded) {
+    _.get('locations').then((results) => {
+      const locations = results.data().results;
+
+      setLocPins(locations);
+      dispatch(setHasLoaded(true));
+    });
+  }
+
   const toggleLocation = (coords, loc, desc, rate, pf) => {
     setLocationVisible(!isLocationVisible);
+    console.log(coords, loc, desc, rate, pf);
     setCoords(coords);
     setLoc(loc);
     setDesc(desc);
@@ -119,7 +156,8 @@ export default function MapTab() {
               region={initialLocation}
               initialRegion={initialLocation}
             >
-              <MapLocation pressAction={() => toggleLocation([33.213215, -97.1521454], 'Hi Grae c:', 'Demo Description', 4.4, true)} />
+              {/* eslint-disable-next-line max-len */}
+              { locPins.map((location) => <MapLocation pressAction={() => toggleLocation(location.coords, location.name, location.description, location.rating, location.pet_friendly)} />) }
             </MapView>
 
           </View>
@@ -436,7 +474,7 @@ export default function MapTab() {
                 style={[styles.navigateMsg, {
                   fontSize: 22, textAlign: 'center', textAlignVertical: 'center', width: 'auto',
                 }]}
-                onChangeText={(text) => updateNewLoc('location_name', text)}
+                onChangeText={(text) => updateNewLoc('name', text)}
               />
             </Pressable>
           </View>
@@ -463,7 +501,7 @@ export default function MapTab() {
               <TextInput
                 clearTextOnFocus
                 autoCapitalize="words"
-                placeholder="Latitude"
+                placeholder="Longitude"
                 placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                 style={[styles.navigateMsg, {
                   fontSize: 22, textAlign: 'center', textAlignVertical: 'center', width: 'auto',
@@ -485,7 +523,7 @@ export default function MapTab() {
                 style={[styles.navigateMsg, {
                   fontSize: 18, paddingLeft: 15, textAlign: 'left', width: 'auto',
                 }]}
-                onChangeText={(text) => updateNewLoc('lat', text)}
+                onChangeText={(text) => updateNewLoc('description', text)}
               />
             </Pressable>
           </View>
@@ -493,7 +531,7 @@ export default function MapTab() {
             style={[styles.newLocSubmit, { marginTop: 15, alignSelf: 'center', justifyContent: 'center' }]}
             onPress={toggleNewLoc}
           >
-            <Text style={[styles.navigateMsg, { textAlign: 'center' }]}>
+            <Text style={[styles.navigateMsg, { textAlign: 'center' }]} onPress={() => { addLocToDB(); }}>
               Submit
               {'   >'}
             </Text>

@@ -137,6 +137,23 @@ export default StyleSheet.create({
     borderWidth: 3,
     borderColor: pawPink,
   },
+  addPetPicContainer: {
+    alignSelf: 'center',
+    width: Dimensions.get('window').width - 40,
+    height: Dimensions.get('window').width,
+    backgroundColor: pawWhite,
+    borderRadius: 30,
+    borderColor: pawWhite,
+    borderWidth: 5,
+  },
+  addPetPic: {
+    alignSelf: 'center',
+    width: Dimensions.get('window').width - 70,
+    height: Dimensions.get('window').width - 70,
+    borderRadius: 30,
+    borderColor: pawWhite,
+    borderWidth: 5,
+  },
   scrollIndicator: {
     marginBottom: 20,
     borderWidth: 2,
@@ -215,6 +232,12 @@ export default StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'QuicksandBold',
     color: pawGreen,
+  },
+  upcomingVaccine: {
+    fontSize: 24,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: '#edae49',
   },
   expiredVaccine: {
     fontSize: 24,

@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
 import { Feather } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { getToday } from 'react-native-modern-datepicker';
 import { useSelector } from 'react-redux';
 import dateFormat from 'dateformat';
 import Network from '../util/Network';
@@ -53,6 +54,43 @@ export default function VaccineReminder({ pets }) {
   const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
+  function displayVaccineStatus(vaccine) {
+    const expiryDate = vaccine.time;
+    const today = new Date(getToday());
+    const newDate = new Date(expiryDate);
+    const yearLater = new Date(newDate.setFullYear(newDate.getFullYear() + vaccine.frequency));
+
+    const newYear = new Date(today);
+    const monthLater = new Date(newYear.setMonth(newYear.getMonth() + 1));
+
+    if (yearLater > today) {
+      if (yearLater < monthLater) {
+        return (
+          <Text style={styles.upcomingVaccine}>
+            {dateFormat(yearLater, 'm/d/yy')}
+          </Text>
+        );
+      }
+      return (
+        <Text style={styles.activeVaccine}>
+          {dateFormat(yearLater, 'm/d/yy')}
+        </Text>
+      );
+    }
+    return (
+      <Text style={styles.expiredVaccine}>
+        {dateFormat(yearLater, 'm/d/yy')}
+      </Text>
+    );
+  }
+
+  function find(vaccination) {
+    const datedVaccine = currentVaccinations.find(
+      (vaccine) => vaccine.vaccine_name === vaccination,
+    );
+    return datedVaccine;
+  }
+
   // eslint-disable-next-line consistent-return
   function displayVaccineList() {
     if (currentPet) {
@@ -63,7 +101,6 @@ export default function VaccineReminder({ pets }) {
           },
         }).then((results) => {
           const vaccinations = results.data().results;
-          console.log(vaccinations);
 
           setCurrentVaccinations(vaccinations);
           setVaccinesLoaded(true);
@@ -73,27 +110,53 @@ export default function VaccineReminder({ pets }) {
       if (currentPet.type === 'dog') {
         return (
           dogVaccinations.map((vaccination) => (
-            <View style={styles.appointmentPiece}>
-              <Text style={styles.vaccineText}>
-                {vaccination}
-              </Text>
-              <Text style={styles.expiredVaccine}>
-                {dateFormat(new Date(), 'm/d/yy')}
-              </Text>
-            </View>
-          ))
-        );
+            find(vaccination) ? (
+              <View style={styles.appointmentPiece}>
+                <Text style={styles.vaccineText}>
+                  {vaccination}
+                </Text>
+                <Text>
+                  {displayVaccineStatus((find(vaccination)))}
+                </Text>
+              </View>
+            )
+              : (
+                <View style={styles.appointmentPiece}>
+                  <Text style={styles.vaccineText}>
+                    {vaccination}
+                  </Text>
+                  <Text style={styles.vaccineText}>
+                    N/A
+                  </Text>
+                </View>
+              )
+          )));
       }
       return (
         catVaccinations.map((vaccination) => (
-          <View style={styles.appointmentPiece}>
-            <Text style={styles.vaccineText}>
-              {vaccination}
-            </Text>
-            <Text style={styles.expiredVaccine}>
-              {dateFormat(new Date(), 'm/d/yy')}
-            </Text>
-          </View>
+          currentVaccinations.map((datedVaccine) => (
+            vaccination === datedVaccine.vaccine_name
+              ? (
+                <View style={styles.appointmentPiece}>
+                  <Text style={styles.vaccineText}>
+                    {vaccination}
+                  </Text>
+                  <Text style={styles.expiredVaccine}>
+                    {dateFormat(datedVaccine.time, 'm/d/yy')}
+                  </Text>
+                </View>
+              )
+              : (
+                <View style={styles.appointmentPiece}>
+                  <Text style={styles.vaccineText}>
+                    {vaccination}
+                  </Text>
+                  <Text style={styles.vaccineText}>
+                    N/A
+                  </Text>
+                </View>
+              )
+          ))
         ))
       );
     }

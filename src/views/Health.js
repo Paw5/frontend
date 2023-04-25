@@ -15,6 +15,7 @@ import { Picker } from '@react-native-picker/picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as Calendar from 'expo-calendar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import lstyles, { pawPink, pawWhite, pawGrey } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
@@ -57,6 +58,21 @@ export default function HealthTab() {
   const [formEntry, setFormEntry] = useState({});
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const hasLoaded = useSelector((state) => state.cardLoader.hasLoaded);
+  const [image, setImage] = useState(null);
+  const [isPicVisible, setPicVisible] = useState(false);
+  const togglePic = () => {
+    setPicVisible(!isPicVisible);
+  };
+
+  const newImageAdded = async () => {
+    const newImage = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+      aspect: [4, 4],
+    });
+    setImage(newImage.uri);
+  };
 
   useEffect(() => {
     (async () => {
@@ -144,8 +160,6 @@ export default function HealthTab() {
 
     const networkResponse = await _.post(`pets/${userId}`, formEntry);
     networkResponse.onSuccess(() => {
-      console.log(formEntry);
-      console.log(typeof formEntry.event_id);
       resetAddForm();
       setFormEntry({});
     });
@@ -270,7 +284,7 @@ export default function HealthTab() {
                           style={styles.profileIcon}
                           source={miso}
                         />
-                        <Pressable>
+                        <Pressable onPress={togglePic}>
                           <Feather
                             name="camera"
                             size={30}
@@ -278,6 +292,36 @@ export default function HealthTab() {
                             style={styles.cameraIcon}
                           />
                         </Pressable>
+                        <Modal
+                          isVisible={isPicVisible}
+                          onBackdropPress={togglePic}
+                          animationIn="fadeInUp"
+                          animationInTiming={200}
+                          animationOut="fadeOutDown"
+                          animationOutTiming={200}
+                        >
+                          <View style={styles.addPetPicContainer}>
+                            <Pressable onPress={newImageAdded} style={styles.addPetPic}>
+                              <Feather
+                                name="plus"
+                                size={30}
+                                color={pawGreen}
+                                style={styles.settingsExitButton}
+                              />
+                              {image && <Image source={{ uri: image }} style={[styles.addPetPic, { position: 'absolute' }]} />}
+                            </Pressable>
+
+                            <Pressable
+                              style={[styles.submitbutton, { width: Dimensions.get('window').width - 70 }]}
+                            >
+                              <Text
+                                style={styles.submittext}
+                              >
+                                Submit
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </Modal>
                       </View>
                     </View>
 

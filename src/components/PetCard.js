@@ -51,7 +51,7 @@ export default function PetCard({ pet }) {
   const [isGramsSelected, setGramsSelected] = useState(false);
   const [ismLSelected, setmLSelected] = useState(false);
   const [mealRestrictions, setMealRestrcitions] = useState('');
-  const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Paraiflueza', 'Rabies', 'Leptospirosis', 'Bordetella'];
+  const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
   const scrollX = new Animated.Value(0);
@@ -173,13 +173,12 @@ export default function PetCard({ pet }) {
   }
 
   async function deleteBirthdayFromCalendar(event) {
-    console.log(event);
-    console.log(typeof event);
-    await Calendar.deleteEventAsync(event, { futureEvents: true });
+    if (event) {
+      await Calendar.deleteEventAsync(event, { futureEvents: true });
+    }
   }
 
   const removePetFromDB = async () => {
-    console.log(pet);
     deleteBirthdayFromCalendar(pet.event_id);
     const networkResponse = await _.delete(`pets/${userId}/${petID}`);
     networkResponse.onSuccess(() => {
@@ -227,9 +226,9 @@ export default function PetCard({ pet }) {
             style={styles.dropdown}
             itemStyle={styles.dropdown}
             selectedValue={selectedVaccine}
-            onValueChange={(index) => {
-              updateFormEntry('vaccine_name', index);
-              setSelectedVaccine(index);
+            onValueChange={(value) => {
+              updateFormEntry('vaccine_name', value);
+              setSelectedVaccine(value);
             }}
           >
             {dogVaccinations.map((value) => (
@@ -336,9 +335,9 @@ export default function PetCard({ pet }) {
             style={styles.dropdown}
             itemStyle={styles.dropdown}
             selectedValue={selectedVaccine}
-            onValueChange={(index) => {
-              setSelectedVaccine(index);
-              updateFormEntry('vaccine_name', index);
+            onValueChange={(value) => {
+              setSelectedVaccine(value);
+              updateFormEntry('vaccine_name', value);
             }}
           >
             {catVaccinations.map((value) => (

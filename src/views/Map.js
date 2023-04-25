@@ -24,6 +24,7 @@ const noPetF = require('../../assets/notPetFriendly.png');
 const PetF = require('../../assets/petFriendly.png');
 
 const StatusBarHeight = getStatusBarHeight();
+const _ = Network();
 
 export default function MapTab() {
   const dispatch = useDispatch();
@@ -50,8 +51,6 @@ export default function MapTab() {
       setNewLocVisible(!isNewLocVisible);
     }
   };
-
-  const _ = Network();
 
   const [newLoc, setNewLoc] = useState({});
   const [coordsNow, setCoords] = useState([]);
@@ -112,7 +111,8 @@ export default function MapTab() {
 
   if (!hasLoaded) {
     _.get('locations').then((results) => {
-      const locations = results.data().results;
+      const locations = results.data();
+      console.log(results.data());
 
       setLocPins(locations);
       dispatch(setHasLoaded(true));

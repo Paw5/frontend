@@ -112,8 +112,6 @@ export default function MapTab() {
   if (!hasLoaded) {
     _.get('locations').then((results) => {
       const locations = results.data();
-      console.log(results.data());
-
       setLocPins(locations);
       dispatch(setHasLoaded(true));
     });

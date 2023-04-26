@@ -41,7 +41,7 @@ class Network {
       options: {
         headers: {
           authorization: loginToken ? `Bearer ${loginToken}` : undefined,
-          ...options && options.headers,
+          ...(options && options.headers),
         },
         ...options,
       },
@@ -68,7 +68,7 @@ class Network {
       options: {
         headers: {
           authorization: loginToken ? `Bearer ${loginToken}` : undefined,
-          ...options && options.headers,
+          ...(options && options.headers),
         },
         ...options,
       },

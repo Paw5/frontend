@@ -72,13 +72,12 @@ export default function MapTab() {
   const [isCheckedcheck, setCheckedcheck] = useState(false);
   const [isLocationVisible, setLocationVisible] = useState(false);
   const hasLoaded = useSelector((state) => state.locationLoader.hasLoaded);
+  const newLocEntry = newLoc;
+  newLocEntry.rating = 0;
+  newLocEntry.pet_friendly = true;
+  newLocEntry.coords = [];
 
   const updateNewLoc = (key, value) => {
-    const newLocEntry = newLoc;
-    newLocEntry.rating = 0;
-    newLocEntry.pet_friendly = true;
-    newLocEntry.coords[0] = [];
-    newLocEntry.coords[1] = [];
     if (key !== 'lat' && key !== 'lon') {
       newLocEntry[key] = value;
     } else if (key === 'lat') {
@@ -102,6 +101,7 @@ export default function MapTab() {
   };
 
   const addLocToDB = async () => {
+    console.log(newLoc);
     const networkResponse = await _.post('locations', newLoc);
     networkResponse.onSuccess(() => {
       // resetAddForm();
@@ -157,7 +157,7 @@ export default function MapTab() {
               initialRegion={initialLocation}
             >
               {/* eslint-disable-next-line max-len */}
-              { locPins.map((location) => <MapLocation pressAction={() => toggleLocation(location.coords, location.name, location.description, location.rating, location.pet_friendly)} />) }
+              { locPins.map((location) => <MapLocation pressAction={() => toggleLocation(location.coords, location.name, location.description, location.rating, location.pet_friendly)} coords={location.coords} />) }
             </MapView>
 
           </View>
@@ -517,7 +517,6 @@ export default function MapTab() {
             >
               <TextInput
                 clearTextOnFocus
-                autoCapitalize="words"
                 placeholder="Location Description"
                 placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
                 style={[styles.navigateMsg, {

@@ -4,12 +4,12 @@ import { Marker } from 'react-native-maps';
 
 const mapPin = require('../../assets/map_pin_s.png');
 
-export default function mapLocation({ pressAction }) {
+export default function mapLocation({ pressAction, coords }) {
   return (
     <Marker
       coordinate={{
-        latitude: 33.213215,
-        longitude: -97.1521454,
+        latitude: coords.y,
+        longitude: coords.x,
       }}
       image={mapPin}
       onPress={pressAction}

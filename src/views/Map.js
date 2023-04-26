@@ -119,7 +119,6 @@ export default function MapTab() {
 
   const toggleLocation = (coords, loc, desc, rate, pf) => {
     setLocationVisible(!isLocationVisible);
-    console.log(coords, loc, desc, rate, pf);
     setCoords(coords);
     setLoc(loc);
     setDesc(desc);

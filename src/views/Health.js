@@ -58,10 +58,36 @@ export default function HealthTab() {
   const [formEntry, setFormEntry] = useState({});
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const hasLoaded = useSelector((state) => state.cardLoader.hasLoaded);
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState(miso);
   const [isPicVisible, setPicVisible] = useState(false);
   const togglePic = () => {
     setPicVisible(!isPicVisible);
+  };
+
+  if (!userId) {
+    _.get('login').then((response) => {
+      response.onSuccess((results) => {
+        setUserId(results.data.user_id);
+      });
+    });
+  }
+
+  // add pic to database
+  const addPictoPet = async (petID) => {
+    console.log(userId);
+    if (image) {
+      const imageFetch = await fetch(image);
+      const blob = await imageFetch.blob();
+      const networkResponse = await _.post(`pics/pets/${petID}/${image.split('/').slice(-1)[0]}`, blob, {
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+      });
+      networkResponse.onClientError((results) => {
+        console.log(results.data);
+        console.log('yay');
+      });
+    }
   };
 
   const newImageAdded = async () => {
@@ -72,6 +98,7 @@ export default function HealthTab() {
       aspect: [4, 4],
     });
     setImage(newImage.uri);
+    console.log(newImage);
   };
 
   useEffect(() => {
@@ -83,14 +110,6 @@ export default function HealthTab() {
       }
     })();
   }, []);
-
-  if (!userId) {
-    _.get('login').then((response) => {
-      response.onSuccess((results) => {
-        setUserId(results.data.user_id);
-      });
-    });
-  }
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -159,7 +178,9 @@ export default function HealthTab() {
     addBirthdayToCalendar(formEntry);
 
     const networkResponse = await _.post(`pets/${userId}`, formEntry);
-    networkResponse.onSuccess(() => {
+    networkResponse.onSuccess((response) => {
+      console.log(response.data.pet_id);
+      addPictoPet(response.data.pet_id);
       resetAddForm();
       setFormEntry({});
     });
@@ -282,7 +303,7 @@ export default function HealthTab() {
                         <Image
                           resizeMode="cover"
                           style={styles.profileIcon}
-                          source={miso}
+                          source={{ uri: image }}
                         />
                         <Pressable onPress={togglePic}>
                           <Feather
@@ -313,6 +334,7 @@ export default function HealthTab() {
 
                             <Pressable
                               style={[styles.submitbutton, { width: Dimensions.get('window').width - 70 }]}
+                              onPress={newImageAdded}
                             >
                               <Text
                                 style={styles.submittext}

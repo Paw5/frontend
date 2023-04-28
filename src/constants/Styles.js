@@ -140,19 +140,26 @@ export default StyleSheet.create({
   addPetPicContainer: {
     alignSelf: 'center',
     width: Dimensions.get('window').width - 40,
-    height: Dimensions.get('window').width,
+    height: Dimensions.get('window').width + 60,
     backgroundColor: pawWhite,
     borderRadius: 30,
     borderColor: pawWhite,
     borderWidth: 5,
+    justifyContent: 'center',
   },
-  addPetPic: {
+  addPetPicButton: {
     alignSelf: 'center',
     width: Dimensions.get('window').width - 70,
     height: Dimensions.get('window').width - 70,
     borderRadius: 30,
-    borderColor: pawWhite,
+    borderColor: pawGreen,
     borderWidth: 5,
+    justifyContent: 'center',
+  },
+  addPetPic: {
+    width: Dimensions.get('window').width - 80,
+    height: Dimensions.get('window').width - 80,
+    borderRadius: 25,
   },
   scrollIndicator: {
     marginBottom: 20,
@@ -203,6 +210,24 @@ export default StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'QuicksandBold',
     color: pawGrey,
+  },
+  currentAppointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: pawGreen,
+  },
+  upcomingAppointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: '#edae49',
+  },
+  expiredAppointmentText: {
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'QuicksandBold',
+    color: '#b81d1d',
   },
   addAppointment: {
     margin: 10,

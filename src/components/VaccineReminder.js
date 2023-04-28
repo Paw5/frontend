@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import {
   View, Text, Pressable, Keyboard,
   Platform, TouchableWithoutFeedback,
@@ -51,10 +52,28 @@ export default function VaccineReminder({ pets }) {
     toggleStatus();
   };
 
+  const setVaccineStatus = (thisStatus, thisPet) => {
+    if (!thisPet.status) {
+      if (thisStatus === 'expired') {
+        thisPet.status = 2;
+        setCurrentPet(thisPet);
+      } else if (thisStatus === 'current') {
+        thisPet.status = 3;
+        setCurrentPet(thisPet);
+      }
+    } else if (thisPet.status === 1 && thisStatus === 'expired') {
+      thisPet.status = 2;
+      setCurrentPet(thisPet);
+    } else if (thisPet.status === 3 && thisStatus === 'warning') {
+      thisPet.status = 1;
+      setCurrentPet(thisPet);
+    }
+  };
+
   const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
   const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
-  function displayVaccineStatus(vaccine) {
+  function displayVaccineStatus(vaccine, thisPet) {
     const expiryDate = vaccine.time;
     const today = new Date(getToday());
     const newDate = new Date(expiryDate);
@@ -65,18 +84,21 @@ export default function VaccineReminder({ pets }) {
 
     if (yearLater > today) {
       if (yearLater < monthLater) {
+        setVaccineStatus('warning', thisPet);
         return (
           <Text style={styles.upcomingVaccine}>
             {dateFormat(yearLater, 'm/d/yy')}
           </Text>
         );
       }
+      setVaccineStatus('current', thisPet);
       return (
         <Text style={styles.activeVaccine}>
           {dateFormat(yearLater, 'm/d/yy')}
         </Text>
       );
     }
+    setVaccineStatus('expired', thisPet);
     return (
       <Text style={styles.expiredVaccine}>
         {dateFormat(yearLater, 'm/d/yy')}
@@ -116,7 +138,31 @@ export default function VaccineReminder({ pets }) {
                   {vaccination}
                 </Text>
                 <Text>
-                  {displayVaccineStatus((find(vaccination)))}
+                  {displayVaccineStatus((find(vaccination)), currentPet)}
+                </Text>
+              </View>
+            )
+              : (
+                <View style={styles.appointmentPiece}>
+                  <Text style={styles.vaccineText}>
+                    {vaccination}
+                  </Text>
+                  <Text style={styles.vaccineText}>
+                    N/A
+                  </Text>
+                </View>
+              )
+          )));
+      } if (currentPet.type === 'cat') {
+        return (
+          catVaccinations.map((vaccination) => (
+            find(vaccination) ? (
+              <View style={styles.appointmentPiece}>
+                <Text style={styles.vaccineText}>
+                  {vaccination}
+                </Text>
+                <Text>
+                  {displayVaccineStatus((find(vaccination)), currentPet)}
                 </Text>
               </View>
             )
@@ -132,34 +178,34 @@ export default function VaccineReminder({ pets }) {
               )
           )));
       }
+    }
+  }
+
+  function showStatus(pet) {
+    if (pet.status === 1) {
       return (
-        catVaccinations.map((vaccination) => (
-          currentVaccinations.map((datedVaccine) => (
-            vaccination === datedVaccine.vaccine_name
-              ? (
-                <View style={styles.appointmentPiece}>
-                  <Text style={styles.vaccineText}>
-                    {vaccination}
-                  </Text>
-                  <Text style={styles.expiredVaccine}>
-                    {dateFormat(datedVaccine.time, 'm/d/yy')}
-                  </Text>
-                </View>
-              )
-              : (
-                <View style={styles.appointmentPiece}>
-                  <Text style={styles.vaccineText}>
-                    {vaccination}
-                  </Text>
-                  <Text style={styles.vaccineText}>
-                    N/A
-                  </Text>
-                </View>
-              )
-          ))
-        ))
+        <Text style={styles.upcomingAppointmentText}>
+          Due Soon
+        </Text>
+      );
+    } if (pet.status === 2) {
+      return (
+        <Text style={styles.expiredAppointmentText}>
+          Expired
+        </Text>
+      );
+    } if (pet.status === 3) {
+      return (
+        <Text style={styles.currentAppointmentText}>
+          Current
+        </Text>
       );
     }
+    return (
+      <Text style={styles.appointmentText}>
+        N/A
+      </Text>
+    );
   }
 
   return (
@@ -177,8 +223,8 @@ export default function VaccineReminder({ pets }) {
               <Text style={styles.appointmentText}>
                 {pet.pet_name}
               </Text>
-              <Text style={styles.appointmentText}>
-                Status
+              <Text>
+                {showStatus(pet)}
               </Text>
             </View>
           </Pressable>

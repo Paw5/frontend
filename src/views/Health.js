@@ -34,7 +34,7 @@ import catBreeds from '../constants/catBreeds.json';
 const dBreeds = dogBreeds.breeds;
 const cBreeds = catBreeds.breeds;
 const PickerItem = Picker.Item;
-const miso = require('../../assets/petPhotos/miso.jpg');
+const defaultLogo = require('../../assets/Paw5Logo-limited.png');
 
 const emptyList = [];
 
@@ -58,7 +58,7 @@ export default function HealthTab() {
   const [formEntry, setFormEntry] = useState({});
   const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const hasLoaded = useSelector((state) => state.cardLoader.hasLoaded);
-  const [image, setImage] = useState(miso);
+  const [image, setImage] = useState(defaultLogo);
   const [isPicVisible, setPicVisible] = useState(false);
   const togglePic = () => {
     setPicVisible(!isPicVisible);
@@ -74,17 +74,16 @@ export default function HealthTab() {
 
   // add pic to database
   const addPictoPet = async (petID) => {
-    console.log(userId);
     if (image) {
       const imageFetch = await fetch(image);
       const blob = await imageFetch.blob();
-      const networkResponse = await _.post(`pics/pets/${petID}/${image.split('/').slice(-1)[0]}`, blob, {
+      const networkResponse = await _.postImage(`pics/pets/${petID}/${image.split('/').slice(-1)[0]}`, blob, {
         headers: {
           'Content-Type': 'image/jpeg',
         },
       });
       networkResponse.onClientError((results) => {
-        console.log(results.data);
+        console.log(results);
         console.log('yay');
       });
     }
@@ -97,8 +96,7 @@ export default function HealthTab() {
       allowsEditing: true,
       aspect: [4, 4],
     });
-    setImage(newImage.uri);
-    console.log(newImage);
+    setImage(newImage);
   };
 
   useEffect(() => {
@@ -179,7 +177,6 @@ export default function HealthTab() {
 
     const networkResponse = await _.post(`pets/${userId}`, formEntry);
     networkResponse.onSuccess((response) => {
-      console.log(response.data.pet_id);
       addPictoPet(response.data.pet_id);
       resetAddForm();
       setFormEntry({});
@@ -288,6 +285,7 @@ export default function HealthTab() {
                     <Pressable
                       onPress={toggleAdd}
                       style={{ alignSelf: 'flex-start' }}
+                      hitSlop={20}
                     >
                       <Feather
                         name="chevron-left"
@@ -303,7 +301,7 @@ export default function HealthTab() {
                         <Image
                           resizeMode="cover"
                           style={styles.profileIcon}
-                          source={{ uri: image }}
+                          source={image}
                         />
                         <Pressable onPress={togglePic}>
                           <Feather
@@ -322,19 +320,19 @@ export default function HealthTab() {
                           animationOutTiming={200}
                         >
                           <View style={styles.addPetPicContainer}>
-                            <Pressable onPress={newImageAdded} style={styles.addPetPic}>
+                            <Pressable onPress={newImageAdded} style={styles.addPetPicButton}>
                               <Feather
-                                name="plus"
+                                name="plus-circle"
                                 size={30}
                                 color={pawGreen}
                                 style={styles.settingsExitButton}
                               />
-                              {image && <Image source={{ uri: image }} style={[styles.addPetPic, { position: 'absolute' }]} />}
+                              {image && <Image source={image} style={[styles.addPetPic, { position: 'absolute' }]} />}
                             </Pressable>
 
                             <Pressable
-                              style={[styles.submitbutton, { width: Dimensions.get('window').width - 70 }]}
-                              onPress={newImageAdded}
+                              style={[styles.submitbutton, { width: Dimensions.get('window').width - 70, marginTop: 20 }]}
+                              onPress={togglePic}
                             >
                               <Text
                                 style={styles.submittext}

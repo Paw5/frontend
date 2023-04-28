@@ -1,13 +1,13 @@
 import {
-  Text, Pressable, View,
+  Text, Pressable, View, Linking,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Feather } from '@expo/vector-icons';
 import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 
-export default function NewsTab() {
+export default function NewsTab({ article }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
 
@@ -16,10 +16,18 @@ export default function NewsTab() {
     else setStyles(lstyles);
   }, [isDarkMode]);
 
+  const openLink = useCallback(async () => {
+    const supported = await Linking.canOpenURL(article.url);
+
+    if (supported) {
+      await Linking.openURL(article.url);
+    }
+  });
+
   return (
 
     <Pressable style={styles.newsTab}>
-      <Text style={styles.newsHeader}>Breaking News!</Text>
+      <Text style={styles.newsHeader}>{article.title}</Text>
 
       <View
         style={styles.eventBottomBorder}
@@ -27,20 +35,17 @@ export default function NewsTab() {
 
       <View style={styles.eventTextView}>
         <Text style={styles.eventText} numberOfLines={4}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit,sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo conquat. Duiaute irure
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
+          {article.body}
         </Text>
 
-        <Feather
-          name="arrow-right-circle"
-          size={30}
-          color={isDarkMode === 'light' ? pawYellow : pawGrey}
-          style={{ alignSelf: 'center' }}
-        />
+        <Pressable onPress={openLink}>
+          <Feather
+            name="arrow-right-circle"
+            size={30}
+            color={isDarkMode === 'light' ? pawYellow : pawGrey}
+            style={{ alignSelf: 'center' }}
+          />
+        </Pressable>
       </View>
     </Pressable>
   );

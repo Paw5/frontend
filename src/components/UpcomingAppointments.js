@@ -3,70 +3,113 @@ import {
   Platform, TextInput, Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-native-modal';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather } from '@expo/vector-icons';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import dateFormat from 'dateformat';
 import * as Calendar from 'expo-calendar';
 import lstyles, {
   pawPink,
 } from '../constants/Styles';
-import dstyles, { pawYellow, pawGrey } from '../constants/DarkStyles';
+import dstyles, { pawYellow, pawGrey, pawGreen } from '../constants/DarkStyles';
 import { setCalendarID } from '../redux/CalendarSlice';
 
-const calID = '@calendarID';
+let newID = '';
 
 async function getDefaultCalendarSource() {
   const defaultCalendar = await Calendar.getDefaultCalendarAsync();
   return defaultCalendar.source;
 }
 
-// async function createCalendar() {
-//   const defaultCalendarSource = Platform.OS === 'ios'
-//     ? await getDefaultCalendarSource()
-//     : { isLocalAccount: true, name: 'Paw5' };
-//   const newCalendarID = await Calendar.createCalendarAsync({
-//     title: 'Paw5',
-//     color: '#69a297',
-//     entityType: Calendar.EntityTypes.EVENT,
-//     sourceId: defaultCalendarSource.id,
-//     source: defaultCalendarSource,
-//     name: 'internalCalendarName',
-//     ownerAccount: 'personal',
-//     accessLevel: Calendar.CalendarAccessLevel.OWNER,
-//   });
+async function createCalendar() {
+  const defaultCalendarSource = Platform.OS === 'ios'
+    ? await getDefaultCalendarSource()
+    : { isLocalAccount: true, name: 'Paw5' };
 
-//   console.log(`Your new calendar ID is: ${newCalendarID}`);
-//   return newCalendarID;
-// }
+  const existingCalendar = await AsyncStorage.getItem('@calendarID');
+
+  if (typeof (calendarExists) !== 'object') {
+    newID = existingCalendar;
+  } else {
+    const newCalendarID = await Calendar.createCalendarAsync({
+      title: 'Paw5',
+      color: '#69a297',
+      entityType: Calendar.EntityTypes.EVENT,
+      sourceId: defaultCalendarSource.id,
+      source: defaultCalendarSource,
+      name: 'internalCalendarName',
+      ownerAccount: 'personal',
+      accessLevel: Calendar.CalendarAccessLevel.OWNER,
+    });
+    newID = newCalendarID;
+    AsyncStorage.setItem('@calendarID', newCalendarID);
+  }
+}
+
+async function getMonthsEvents() {
+  const currentCalendar = [await AsyncStorage.getItem('@calendarID')];
+
+  const startDate = new Date();
+  const month = startDate.getMonth() + 1;
+  const endDate = new Date();
+  endDate.setMonth(month);
+
+  const monthsEvents = await
+  Calendar.getEventsAsync(currentCalendar, new Date(startDate), new Date(endDate));
+
+  return monthsEvents;
+}
 
 export default function UpcomingAppointments() {
-  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
   const dispatch = useDispatch();
-
-  const getData = async () => {
-    try {
-      const data = await AsyncStorage.getItem(calID);
-
-      return data;
-    } catch (e) {
-      return (e);
-    }
-  };
+  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+  const [monthsEvents, setMonthsEvents] = useState([]);
+  const [allEventsCollected, setEventsCollected] = useState(false);
 
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === 'granted') {
-        dispatch(setCalendarID(await createCalendar()));
-        AsyncStorage.setItem(calID, defaultCalendar);
-        getData();
+      if (status === 'granted' && defaultCalendar === 'none') {
+        await createCalendar();
+        dispatch(setCalendarID(newID));
       }
     })();
   }, []);
+
+  if (!allEventsCollected) {
+    (async () => {
+      const events = await getMonthsEvents();
+      setMonthsEvents(events);
+      setEventsCollected(true);
+    })();
+  }
+
+  function addHour(date) {
+    const endHour = new Date(date);
+    return endHour.setHours(endHour.getHours() + 1);
+  }
+
+  async function addEvent(ID, event) {
+    const newEvent = {
+      title: event.title,
+      startDate: new Date(event.startDate),
+      endDate: new Date(addHour(event.startDate)),
+      location: event.location,
+    };
+
+    await Calendar.createEventAsync(ID, newEvent);
+
+    setEventsCollected(false);
+  }
+
+  const [eventAdded, showEventAdded] = useState(false);
+  const toggleSuccess = () => {
+    showEventAdded(!eventAdded);
+  };
 
   const [formEntry, setFormEntry] = useState({});
   const updateFormEntry = (key, value) => {
@@ -95,6 +138,11 @@ export default function UpcomingAppointments() {
     setDateVisible(!isDateVisible);
   };
 
+  const closeAll = () => {
+    showEventAdded(false);
+    setAddVisible(false);
+  };
+
   const [selectedDate, setSelectedDate] = useState(dateFormat(new Date(), 'mm/dd/yyyy\nh:MM tt'));
 
   return (
@@ -105,23 +153,18 @@ export default function UpcomingAppointments() {
         style={styles.healthDivider}
       />
       <View style={{ flex: 2 }}>
-        <View style={styles.appointmentPiece}>
-          <Text style={styles.appointmentText}>
-            Appointment Name
-          </Text>
-          <Text style={styles.appointmentText}>
-            Date
-          </Text>
-        </View>
 
-        <View style={styles.appointmentPiece}>
-          <Text style={styles.appointmentText}>
-            Appointment Name
-          </Text>
-          <Text style={styles.appointmentText}>
-            Date
-          </Text>
-        </View>
+        { monthsEvents.map((event, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <View style={styles.appointmentPiece} key={`appointment-${index}`}>
+            <Text style={styles.appointmentText}>
+              {event.title}
+            </Text>
+            <Text style={styles.appointmentText}>
+              {dateFormat(event.startDate, 'm/dd @ h:MM tt')}
+            </Text>
+          </View>
+        )) }
 
       </View>
 
@@ -177,7 +220,7 @@ export default function UpcomingAppointments() {
                   autoCapitalize="words"
                   placeholder="Name"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                   onChangeText={(text) => updateFormEntry('title', text)}
                 />
               </Pressable>
@@ -194,7 +237,7 @@ export default function UpcomingAppointments() {
                   autoCapitalize="words"
                   placeholder="Location"
                   placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                  style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+                  style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
                   onChangeText={(text) => updateFormEntry('location', text)}
                 />
               </Pressable>
@@ -224,19 +267,23 @@ export default function UpcomingAppointments() {
                 >
                   <DatePicker
                     options={styles.datePicker}
+                    minimumDate={getToday()}
                     style={styles.dateContainer}
                     current={getToday()}
                     selected={getToday()}
                     onSelectedChange={(date) => {
                       setSelectedDate(date);
-                      updateFormEntry('startDate', date);
+                      updateFormEntry('startDate', new Date(date));
                     }}
                   />
                 </Modal>
               </Pressable>
 
               <Pressable
-                onPress={() => { Calendar.createEventAsync(defaultCalendar, formEntry); }}
+                onPress={() => {
+                  addEvent(defaultCalendar, formEntry);
+                  toggleSuccess();
+                }}
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
               >
                 <Text
@@ -245,6 +292,19 @@ export default function UpcomingAppointments() {
                   Add to Calendar
                 </Text>
               </Pressable>
+
+              <AwesomeAlert
+                show={eventAdded}
+                title="Event Added!"
+                confirmText="Yay!"
+                titleStyle={styles.alertText}
+                contentContainerStyle={styles.alertBackground}
+                showConfirmButton
+                confirmButtonTextStyle={styles.confirmButton}
+                onConfirmPressed={closeAll}
+                style={{ borderRadius: 50, overflow: 'hidden' }}
+                confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+              />
             </View>
           </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>

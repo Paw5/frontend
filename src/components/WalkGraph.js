@@ -8,6 +8,7 @@ import { Feather } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { LineChart } from 'react-native-chart-kit';
 import { useSelector } from 'react-redux';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import DatePicker, { getToday } from 'react-native-modern-datepicker';
 import dateFormat from 'dateformat';
 import lstyles, {
@@ -23,7 +24,6 @@ const darkDots = () => pawGreen;
 export default function WalkGraph() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
-
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
     else setStyles(lstyles);
@@ -41,6 +41,16 @@ export default function WalkGraph() {
   const [isDateVisible, setDateVisible] = useState(false);
   const toggleDate = () => {
     setDateVisible(!isDateVisible);
+  };
+
+  const [eventAdded, showEventAdded] = useState(false);
+  const toggleSuccess = () => {
+    showEventAdded(!eventAdded);
+  };
+
+  const closeAll = () => {
+    showEventAdded(false);
+    setAddVisible(false);
   };
 
   const data = {
@@ -172,7 +182,9 @@ export default function WalkGraph() {
                     inputMode="number"
                     placeholder="00"
                     placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                    style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                    style={[styles.menuText, {
+                      fontSize: 22, width: 'auto', paddingRight: 5, marginRight: Platform.OS === 'android' ? 20 : 0,
+                    }]}
                   />
                   <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                     mins
@@ -194,7 +206,9 @@ export default function WalkGraph() {
                     inputMode="number"
                     placeholder="00"
                     placeholderTextColor={isDarkMode === 'light' ? pawYellow : pawGrey}
-                    style={[styles.menuText, { fontSize: 22, width: 'auto', paddingRight: 5 }]}
+                    style={[styles.menuText, {
+                      fontSize: 22, width: 'auto', paddingRight: 5, marginRight: Platform.OS === 'android' ? 20 : 0,
+                    }]}
                   />
                   <Text style={[styles.menuText, { fontSize: 22, width: 'auto', textTransform: 'lowercase' }]}>
                     miles
@@ -204,6 +218,7 @@ export default function WalkGraph() {
 
               <Pressable
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                onPress={toggleSuccess}
               >
                 <Text
                   style={styles.submittext}
@@ -211,6 +226,19 @@ export default function WalkGraph() {
                   Add to Graph
                 </Text>
               </Pressable>
+
+              <AwesomeAlert
+                show={eventAdded}
+                title="Walk Added!"
+                confirmText="Yay!"
+                titleStyle={styles.alertText}
+                contentContainerStyle={styles.alertBackground}
+                showConfirmButton
+                confirmButtonTextStyle={styles.confirmButton}
+                onConfirmPressed={closeAll}
+                style={{ borderRadius: 50, overflow: 'hidden' }}
+                confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+              />
             </View>
           </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>

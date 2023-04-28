@@ -4,6 +4,7 @@ import locationReducer from './LocationSlice';
 import calendarReducer from './CalendarSlice';
 import locloadReducer from './LocationLoaderSlice';
 import servicesReducer from './ServicesSlice';
+import cardLoaderReducer from './CardLoaderSlice';
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     settings: settingsReducer,
     location: locationReducer,
     calendar: calendarReducer,
+    cardLoader: cardLoaderReducer,
   },
 });
 

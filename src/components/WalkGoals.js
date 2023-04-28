@@ -8,6 +8,7 @@ import Slider from '@react-native-community/slider';
 import { Feather } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ProgressChart } from 'react-native-chart-kit';
+import AwesomeAlert from 'react-native-awesome-alerts';
 import { Picker } from '@react-native-picker/picker';
 import Collapsible from '@eliav2/react-native-collapsible-view';
 import { useSelector } from 'react-redux';
@@ -45,6 +46,26 @@ export default function WalkGoals() {
   const [isEditGoalVisible, setEditGoalVisible] = useState(false);
   const toggleEditGoal = () => {
     setEditGoalVisible(!isEditGoalVisible);
+  };
+
+  const [goalAdded, showGoalAdded] = useState(false);
+  const toggleAddSuccess = () => {
+    showGoalAdded(!goalAdded);
+  };
+
+  const [goalEdited, showGoalEdited] = useState(false);
+  const toggleEditSuccess = () => {
+    showGoalEdited(!goalEdited);
+  };
+
+  const closeAdd = () => {
+    showGoalAdded(false);
+    setAddGoalVisible(false);
+  };
+
+  const closeEdit = () => {
+    showGoalEdited(false);
+    setEditGoalVisible(false);
   };
 
   const data = {
@@ -118,12 +139,13 @@ export default function WalkGoals() {
               autoCapitalize="words"
               placeholder="Name"
               placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
-              style={[styles.menuText, { fontSize: 22, width: 'auto' }]}
+              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
             />
           </Pressable>
 
           <Pressable
             style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+            onPress={toggleAddSuccess}
           >
             <Text
               style={styles.submittext}
@@ -131,6 +153,19 @@ export default function WalkGoals() {
               Add Goal
             </Text>
           </Pressable>
+
+          <AwesomeAlert
+            show={goalAdded}
+            title="Goal Added!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeAdd}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
 
           <Pressable
             style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? '#d94545' : '#b81d1d' }]}
@@ -250,6 +285,7 @@ export default function WalkGoals() {
 
               <Pressable
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40 }]}
+                onPress={toggleEditSuccess}
               >
                 <Text
                   style={styles.submittext}
@@ -257,6 +293,19 @@ export default function WalkGoals() {
                   Add to Graph
                 </Text>
               </Pressable>
+
+              <AwesomeAlert
+                show={goalEdited}
+                title="Goal Changed!"
+                confirmText="Yay!"
+                titleStyle={styles.alertText}
+                contentContainerStyle={styles.alertBackground}
+                showConfirmButton
+                confirmButtonTextStyle={styles.confirmButton}
+                onConfirmPressed={closeEdit}
+                style={{ borderRadius: 50, overflow: 'hidden' }}
+                confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+              />
 
               <Pressable
                 style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? '#d94545' : '#b81d1d' }]}

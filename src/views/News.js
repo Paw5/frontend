@@ -14,6 +14,23 @@ import NewsComponent from '../components/NewsTab';
 export default function NewsTab() {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
+  const data = [
+    {
+      title: '5 things a vet would never do as a pet owner',
+      body: 'Pets are members of the family. So when it comes to taking care of yours and giving them the best life, what mistakes should you avoid?',
+      url: 'https://www.today.com/pets/5-things-veterinarian-brett-levitzke-never-do-as-pet-owner-rcna80763',
+    },
+    {
+      title: 'Having a pet may take a toll on your sleep, study suggests',
+      body: 'People with pet dogs were more likely to have sleep disorders, while people with cats were more likely to experience leg jerks, the study found.',
+      url: 'https://www.nbcnews.com/health/health-news/pet-may-take-toll-sleep-study-suggests-rcna75103',
+    },
+    {
+      title: 'People have been setting their pets new year resolutions, study reveals',
+      body: 'Nearly four in 10 pet owners have set a new year’s resolution for their animal companion - if only to help them achieve their own goals',
+      url: 'https://www.independent.co.uk/life-style/pet-owners-new-year-resolutions-b2265134.html',
+    },
+  ];
 
   const scrollX = new Animated.Value(0);
 
@@ -67,10 +84,7 @@ export default function NewsTab() {
           />
         </View>
 
-        <NewsComponent />
-        <NewsComponent />
-        <NewsComponent />
-        <NewsComponent />
+        { data.map((article) => <NewsComponent article={article} key={article.title} />) }
       </ScrollView>
     </View>
   );

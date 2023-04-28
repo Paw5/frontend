@@ -4,11 +4,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const calendarSlice = createSlice({
   name: 'calendar',
   initialState: {
-    calendarID: '',
+    calendarID: 'none',
   },
   reducers: {
     setCalendarID: (state, action) => {
-      state.calendarID = action.payload.calendarID;
+      state.calendarID = action.payload;
     },
   },
 

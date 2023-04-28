@@ -97,14 +97,13 @@ export default function MapTab() {
     if (isLocationVisible) {
       setLocationVisible(!isLocationVisible);
     }
-    Linking.openURL(`https://www.google.com/maps/place/${Math.abs(Math.trunc(coordsNow[0]))}%C2%B0${Math.abs(Math.trunc((coordsNow[0] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[0] % 1) * 60) % 1) * 60))}%22${nors}+${Math.abs(Math.trunc(coordsNow[1]))}%C2%B0${Math.abs(Math.trunc((coordsNow[1] % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow[1] % 1) * 60) % 1) * 60))}%22${eorw}/@${coordsNow[0]},${coordsNow[1]}`);
+    Linking.openURL(`https://www.google.com/maps/place/${Math.abs(Math.trunc(coordsNow.y))}%C2%B0${Math.abs(Math.trunc((coordsNow.y % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow.y % 1) * 60) % 1) * 60))}%22${nors}+${Math.abs(Math.trunc(coordsNow.x))}%C2%B0${Math.abs(Math.trunc((coordsNow.x % 1) * 60))}'${Math.abs(Math.trunc((((coordsNow.x % 1) * 60) % 1) * 60))}%22${eorw}/@${coordsNow.y},${coordsNow.x}`);
   };
 
   const addLocToDB = async () => {
-    console.log(newLoc);
     const networkResponse = await _.post('locations', newLoc);
     networkResponse.onSuccess(() => {
-      // resetAddForm();
+      toggleNewLoc();
       setNewLoc({});
     });
   };
@@ -128,9 +127,9 @@ export default function MapTab() {
     if (coords[1] > 0) {
       seteorw('E');
     }
-    setnors('S');
+    setnors('N');
     if (coords[0] > 0) {
-      setnors('N');
+      setnors('S');
     }
     if (isLocationVisible) {
       setLocationVisible(!isLocationVisible);
@@ -189,7 +188,7 @@ export default function MapTab() {
         >
           <View>
             <Text style={[styles.filterText, { textAlign: 'center', fontSize: 25 }]}>
-              Hey, [username]!
+              Hey there!
             </Text>
             <Text style={[styles.filterText, { textAlign: 'center', fontSize: 15 }]}>
               How was

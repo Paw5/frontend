@@ -324,8 +324,8 @@ export default function HealthTab() {
                               <Feather
                                 name="plus-circle"
                                 size={30}
-                                color={pawGreen}
-                                style={styles.settingsExitButton}
+                                color={isDarkMode === 'light' ? pawLightGrey : pawGreen}
+                                style={styles.addButton}
                               />
                               {image && <Image source={image} style={[styles.addPetPic, { position: 'absolute' }]} />}
                             </Pressable>

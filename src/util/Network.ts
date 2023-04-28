@@ -24,7 +24,7 @@ class Network {
       return this.post(host, body, {
         ...options,
         headers: {
-          ...options && options.headers,
+          ...(options && options.headers),
           'Content-Type': mimeType
         }
       });
@@ -41,7 +41,7 @@ class Network {
       options: {
         headers: {
           authorization: loginToken ? `Bearer ${loginToken}` : undefined,
-          ...options && options.headers,
+          ...(options && options.headers),
         },
         ...options,
       },
@@ -68,7 +68,7 @@ class Network {
       options: {
         headers: {
           authorization: loginToken ? `Bearer ${loginToken}` : undefined,
-          ...options && options.headers,
+          ...(options && options.headers),
         },
         ...options,
       },
@@ -96,7 +96,7 @@ class Network {
       options: {
         headers: {
           Authorization: loginToken ? `Bearer ${loginToken}` : undefined,
-          ...options && options.headers,
+          ...(options && options.headers),
         },
         ...options,
       },

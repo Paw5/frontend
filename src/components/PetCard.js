@@ -1,17 +1,20 @@
 import {
   View, Text, Dimensions, Pressable, Image, TouchableWithoutFeedback,
   ScrollView, Platform, TextInput, TouchableOpacity, Animated,
-  Keyboard,
+  Keyboard, KeyboardAvoidingView,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-native-modal';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
-import { useSelector } from 'react-redux';
+import * as Calendar from 'expo-calendar';
+import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datepicker';
+import { useSelector, useDispatch } from 'react-redux';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import Collapsible from '@eliav2/react-native-collapsible-view';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import { setHasLoaded } from '../redux/CardLoaderSlice';
 import lstyles, {
   pawPink, pawWhite, pawGrey,
 } from '../constants/Styles';
@@ -30,6 +33,7 @@ const emptyList = [];
 const _ = Network();
 
 export default function PetCard({ pet }) {
+  const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const {
@@ -38,7 +42,17 @@ export default function PetCard({ pet }) {
   const [userId, setUserId] = useState(0);
   const [autofillText, setAutofillText] = useState('');
   const [selectedItem, setSelectedItem] = useState(pet.breed);
+  const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'M/D/YY'));
+  const [selectedVaccine, setSelectedVaccine] = useState('Select Vaccination');
   const [itemList, setAnimal] = useState(emptyList);
+  const [formEntry, setFormEntry] = useState({});
+  const [formMealEntry, setMealFormEntry] = useState({});
+  const [isCupsSelected, setCupsSelected] = useState(false);
+  const [isGramsSelected, setGramsSelected] = useState(false);
+  const [ismLSelected, setmLSelected] = useState(false);
+  const [mealRestrictions, setMealRestrcitions] = useState('');
+  const dogVaccinations = ['Distemper', 'Hepititus', 'Parvovirus', 'Parainfluenza', 'Rabies', 'Leptospirosis', 'Bordetella'];
+  const catVaccinations = ['Calicivirus', 'Feline Leukemia', 'Rabies', 'Rhinotracheitis', 'Panleukopenia'];
 
   const scrollX = new Animated.Value(0);
 
@@ -55,6 +69,18 @@ export default function PetCard({ pet }) {
       });
     });
   }
+
+  const updateFormEntry = (key, value) => {
+    const newFormEntry = formEntry;
+    newFormEntry[key] = value;
+    setFormEntry(newFormEntry);
+  };
+
+  const updateMealFormEntry = (key, value) => {
+    const newMealFormEntry = formMealEntry;
+    newMealFormEntry[key] = value;
+    setMealFormEntry(newMealFormEntry);
+  };
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -77,30 +103,333 @@ export default function PetCard({ pet }) {
     showPetRemoved(!petRemoved);
   };
 
-  const [removeSuccess] = useState(false);
+  const [deleteSuccess, showDeleteSuccess] = useState(false);
+
+  const [vaccineAdded, showVaccineAdded] = useState(false);
+  const toggleAddVaccine = () => {
+    showVaccineAdded(!vaccineAdded);
+  };
+
+  const [mealAdded, showMealAdded] = useState(false);
+  const toggleAddMeal = () => {
+    showMealAdded(!mealAdded);
+  };
+
+  const [isMealVisible, showAddMeal] = useState(false);
+  const toggleMeal = () => {
+    showAddMeal(!isMealVisible);
+  };
+
+  const [isMedicalVisible, showAddMedical] = useState(false);
+  const toggleMedical = () => {
+    showAddMedical(!isMedicalVisible);
+  };
+
+  /* toggle date modal */
+  const [isDateVisible, setDateVisible] = useState(false);
+  const toggleDate = () => {
+    setDateVisible(!isDateVisible);
+  };
 
   const closeAll = () => {
+    showDeleteSuccess(false);
     showPetEdited(false);
     setEditVisible(false);
     showPetRemoved(false);
   };
 
+  function resetVaccineForm() {
+    setSelectedDate(getFormatedDate(getToday(), 'M/D/YY'));
+    setSelectedVaccine('Select Vaccination');
+  }
+
+  const addVaccineToPet = async () => {
+    updateFormEntry('time', new Date(formEntry.time));
+    resetVaccineForm();
+    const networkResponse = await _.post(`vaccinations/${petID}`, formEntry);
+    networkResponse.onSuccess(() => {
+      setFormEntry({});
+      toggleAddVaccine();
+    });
+  };
+
+  const addMealToPet = async () => {
+    const networkResponse = await _.post(`vaccinations/${petID}`, formMealEntry);
+    networkResponse.onSuccess(() => {
+      setMealFormEntry({});
+    });
+  };
+
+  const addRestrictionsToPet = async () => {
+    const networkResponse = await _.post(`vaccinations/${petID}`, mealRestrictions);
+    networkResponse.onSuccess(() => {
+      setMealRestrcitions('');
+    });
+  };
+
+  function resetScreen() {
+    showPetRemoved(false);
+    showDeleteSuccess(true);
+  }
+
+  async function deleteBirthdayFromCalendar(event) {
+    if (event) {
+      await Calendar.deleteEventAsync(event, { futureEvents: true });
+    }
+  }
+
   const removePetFromDB = async () => {
+    deleteBirthdayFromCalendar(pet.event_id);
     const networkResponse = await _.delete(`pets/${userId}/${petID}`);
-    networkResponse.onSuccess(() => (
-      <AwesomeAlert
-        show={removeSuccess}
-        title="Pet Deleted!"
-        confirmText="Yay!"
-        titleStyle={styles.alertText}
-        contentContainerStyle={styles.alertBackground}
-        showConfirmButton
-        confirmButtonTextStyle={styles.confirmButton}
-        onConfirmPressed={closeAll}
-        style={{ borderRadius: 50, overflow: 'hidden' }}
-        confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
-      />
-    ));
+    networkResponse.onSuccess(() => {
+      dispatch(setHasLoaded(false));
+      resetScreen();
+    });
+  };
+
+  const createMealInfo = () => {
+    if (isCupsSelected) {
+      updateMealFormEntry('serving_measurement', 'cups');
+    } else if (isGramsSelected) {
+      updateMealFormEntry('serving_measurement', 'grams');
+    } else if (ismLSelected) {
+      updateMealFormEntry('serving_measurement', 'mL');
+    }
+
+    addMealToPet();
+    addRestrictionsToPet();
+  };
+
+  const displayDogVaccines = () => (
+    <View>
+      <Collapsible
+        style={styles.vaccineBubble}
+        touchableComponent
+        noArrow
+        title={(
+          <View>
+            <Text
+              style={styles.vaccineHeader}
+            >
+              Breed
+            </Text>
+            <Text
+              style={styles.vaccineSelection}
+            >
+              {selectedVaccine}
+            </Text>
+          </View>
+        )}
+      >
+        <TouchableOpacity>
+          <Picker
+            style={styles.dropdown}
+            itemStyle={styles.dropdown}
+            selectedValue={selectedVaccine}
+            onValueChange={(value) => {
+              updateFormEntry('vaccine_name', value);
+              setSelectedVaccine(value);
+            }}
+          >
+            {dogVaccinations.map((value) => (
+              <PickerItem
+                label={value}
+                value={value}
+                key={value}
+              />
+            ))}
+          </Picker>
+        </TouchableOpacity>
+      </Collapsible>
+
+      <Pressable
+        style={[styles.vaccineBubble, { width: Dimensions.get('window').width - 40 }]}
+        onPress={toggleDate}
+      >
+        <Text
+          style={[styles.vaccineHeader, { paddingTop: 20 }]}
+        >
+          Last Vaccination
+        </Text>
+        <Text
+          style={styles.vaccineSelection}
+        >
+          {selectedDate}
+        </Text>
+
+        <Modal
+          isVisible={isDateVisible}
+          onBackdropPress={toggleDate}
+          animationIn="fadeInUp"
+          animationInTiming={200}
+          animationOut="fadeOutDown"
+          animationOutTiming={200}
+        >
+          <DatePicker
+            options={styles.datePicker}
+            style={styles.dateContainer}
+            current={getToday()}
+            selected={getToday()}
+            mode="calendar"
+            onSelectedChange={(date) => {
+              updateFormEntry('time', date);
+              setSelectedDate(getFormatedDate(date, 'M/D/YY'));
+            }}
+          />
+        </Modal>
+      </Pressable>
+
+      <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+        <Text
+          style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+        >
+          Frequency
+        </Text>
+        <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+          <TextInput
+            autoCorrect={false}
+            clearTextOnFocus
+            keyboardType="decimal-pad"
+            inputMode="number"
+            placeholder="X"
+            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+            style={[styles.menuText, {
+              fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+            }]}
+            onChangeText={(text) => updateFormEntry('frequency', text)}
+          />
+          <Text style={[styles.menuText, {
+            fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
+          }]}
+          >
+            years
+          </Text>
+        </View>
+      </Pressable>
+    </View>
+  );
+
+  const displayCatVaccines = () => (
+    <View>
+      <Collapsible
+        style={styles.vaccineBubble}
+        touchableComponent
+        noArrow
+        title={(
+          <View>
+            <Text
+              style={styles.vaccineHeader}
+            >
+              Breed
+            </Text>
+            <Text
+              style={styles.vaccineSelection}
+            >
+              {selectedVaccine}
+            </Text>
+          </View>
+          )}
+      >
+        <TouchableOpacity>
+          <Picker
+            style={styles.dropdown}
+            itemStyle={styles.dropdown}
+            selectedValue={selectedVaccine}
+            onValueChange={(value) => {
+              setSelectedVaccine(value);
+              updateFormEntry('vaccine_name', value);
+            }}
+          >
+            {catVaccinations.map((value) => (
+              <PickerItem
+                label={value}
+                value={value}
+                key={value}
+              />
+            ))}
+          </Picker>
+        </TouchableOpacity>
+      </Collapsible>
+
+      <Pressable
+        style={[styles.vaccineBubble, { width: Dimensions.get('window').width - 40 }]}
+        onPress={toggleDate}
+      >
+        <Text
+          style={[styles.vaccineHeader, { paddingTop: 20 }]}
+        >
+          Last Vaccination
+        </Text>
+        <Text
+          style={styles.vaccineSelection}
+        >
+          {selectedDate}
+        </Text>
+
+        <Modal
+          isVisible={isDateVisible}
+          onBackdropPress={toggleDate}
+          animationIn="fadeInUp"
+          animationInTiming={200}
+          animationOut="fadeOutDown"
+          animationOutTiming={200}
+        >
+          <DatePicker
+            options={styles.datePicker}
+            style={styles.dateContainer}
+            current={getToday()}
+            selected={getToday()}
+            mode="calendar"
+            onSelectedChange={(date) => {
+              updateFormEntry('time', date);
+              setSelectedDate(getFormatedDate(date, 'M/D/YY'));
+            }}
+          />
+        </Modal>
+      </Pressable>
+
+      <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+        <Text
+          style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+        >
+          Frequency
+        </Text>
+        <View style={{ flexDirection: 'row', alignContent: 'space-around' }}>
+          <TextInput
+            autoCorrect={false}
+            clearTextOnFocus
+            keyboardType="decimal-pad"
+            inputMode="number"
+            placeholder="X"
+            placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+            style={[styles.menuText, {
+              fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0, paddingRight: 5,
+            }]}
+            onChangeText={(text) => updateFormEntry('frequency', text)}
+          />
+          <Text style={[styles.menuText, {
+            fontSize: 22, width: 'auto', textTransform: 'lowercase', color: isDarkMode === 'light' ? pawYellow : pawWhite,
+          }]}
+          >
+            years
+          </Text>
+        </View>
+      </Pressable>
+    </View>
+  );
+
+  const servingSizeSelector = (id) => {
+    setCupsSelected(false);
+    setGramsSelected(false);
+    setmLSelected(false);
+
+    if (id === 0) {
+      setCupsSelected(true);
+    } else if (id === 1) {
+      setGramsSelected(true);
+    } else {
+      setmLSelected(true);
+    }
   };
 
   return (
@@ -315,7 +644,10 @@ export default function PetCard({ pet }) {
                   </View>
 
                   <View style={{ width: Dimensions.get('window').width }}>
-                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                    <Pressable
+                      onPress={toggleMeal}
+                      style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}
+                    >
                       <Feather
                         name="plus-circle"
                         size={50}
@@ -331,7 +663,213 @@ export default function PetCard({ pet }) {
                       </Text>
                     </Pressable>
 
-                    <Pressable style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}>
+                    <Modal
+                      isVisible={isMealVisible}
+                      onBackdropPress={toggleMeal}
+                      animationIn="fadeInUp"
+                      animationInTiming={200}
+                      animationOut="fadeOutDown"
+                      animationOutTiming={200}
+                      style={{ margin: 0 }}
+                    >
+                      <KeyboardAvoidingView
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                      >
+                        <View style={{
+                          backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
+                        }}
+                        >
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Food Brand
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Name"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('brand_name', text)}
+                            />
+                          </Pressable>
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Food Type
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Type"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('type', text)}
+                            />
+                          </Pressable>
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Serving
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Amount"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('serving_amount', text)}
+                            />
+                          </Pressable>
+
+                          <View style={[styles.menuItem,
+                            {
+                              width: Dimensions.get('window').width - 40,
+                              backgroundColor: pawGreen,
+                              paddingLeft: 0,
+                              paddingRight: 0,
+                              paddingTop: 0,
+                            }]}
+                          >
+                            <Pressable
+                              style={[styles.servingSizeButton,
+                                {
+                                  paddingRight: 30,
+                                  // eslint-disable-next-line no-nested-ternary
+                                  backgroundColor: isCupsSelected
+                                    ? (pawPink) : (pawGreen),
+                                }]}
+                              onPress={() => { servingSizeSelector(0); }}
+                            >
+                              <Text style={[styles.servingSizeText, { paddingLeft: 10 }]}>
+                                cups
+                              </Text>
+                            </Pressable>
+                            <Pressable
+                              style={[styles.servingSizeButton, {
+                                // eslint-disable-next-line no-nested-ternary
+                                backgroundColor: isGramsSelected
+                                  ? (pawPink) : (pawGreen),
+                              }]}
+                              onPress={() => { servingSizeSelector(1); }}
+                            >
+                              <Text style={styles.servingSizeText}>
+                                grams
+                              </Text>
+                            </Pressable>
+                            <Pressable
+                              style={[styles.servingSizeButton,
+                                {
+                                  paddingLeft: 40,
+                                  // eslint-disable-next-line no-nested-ternary
+                                  backgroundColor: ismLSelected
+                                    ? (pawPink) : (pawGreen),
+                                }]}
+                              onPress={() => { servingSizeSelector(2); }}
+                            >
+                              <Text style={[styles.servingSizeText, { paddingRight: 40 }]}>
+                                mL
+                              </Text>
+                            </Pressable>
+                          </View>
+
+                          <Pressable style={[styles.menuItem, { width: Dimensions.get('window').width - 40, backgroundColor: pawGreen }]}>
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Meal Time
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Times per Day"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              style={[styles.menuText, { fontSize: 22, width: 'auto', marginRight: Platform.OS === 'android' ? 20 : 0 }]}
+                              onChangeText={(text) => updateMealFormEntry('time', text)}
+                            />
+                          </Pressable>
+
+                          <Pressable style={[styles.menuItem,
+                            {
+                              width: Dimensions.get('window').width - 40,
+                              backgroundColor: pawGreen,
+                              flexDirection: 'column',
+                              height: 100,
+                              padding: 10,
+                              justifyContent: 'none',
+                            }]}
+                          >
+                            <Text
+                              style={[styles.menuText, styles.accountFields, { color: isDarkMode === 'light' ? pawYellow : pawWhite }]}
+                            >
+                              Dietary Restrictions
+                            </Text>
+                            <TextInput
+                              autoCorrect={false}
+                              clearTextOnFocus
+                              autoCapitalize="words"
+                              placeholder="Restrictions"
+                              placeholderTextColor={isDarkMode === 'light' ? pawGrey : pawGrey}
+                              multiline
+                              returnKeyType="done"
+                              onSubmitEditing={() => { Keyboard.dismiss(); }}
+                              style={[styles.menuText,
+                                {
+                                  fontSize: 22,
+                                  width: 'auto',
+                                  marginRight: Platform.OS === 'android' ? 20 : 0,
+                                  paddingTop: 10,
+                                }]}
+                              onChangeText={(text) => setMealRestrcitions(text)}
+                            />
+                          </Pressable>
+
+                          <Pressable
+                            style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
+                            onPress={() => {
+                              toggleAddMeal();
+                              createMealInfo();
+                            }}
+                          >
+                            <Text
+                              style={styles.submittext}
+                            >
+                              Add Meal
+                            </Text>
+                          </Pressable>
+
+                          <AwesomeAlert
+                            show={mealAdded}
+                            title="Meal Added!"
+                            confirmText="Yay!"
+                            titleStyle={styles.alertText}
+                            contentContainerStyle={styles.alertBackground}
+                            showConfirmButton
+                            confirmButtonTextStyle={styles.confirmButton}
+                            onConfirmPressed={() => {
+                              toggleAddMeal();
+                              toggleMeal();
+                            }}
+                            style={{ borderRadius: 50, overflow: 'hidden' }}
+                            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                          />
+                        </View>
+                      </KeyboardAvoidingView>
+                    </Modal>
+
+                    <Pressable
+                      onPress={toggleMedical}
+                      style={[styles.medicalbutton, { width: Dimensions.get('window').width - 40 }]}
+                    >
                       <Feather
                         name="plus-circle"
                         size={50}
@@ -343,9 +881,56 @@ export default function PetCard({ pet }) {
                         numberOfLines={1}
                         adjustsFontSizeToFit
                       >
-                        Add Medical Information
+                        Add Vaccination Information
                       </Text>
                     </Pressable>
+
+                    <Modal
+                      isVisible={isMedicalVisible}
+                      onBackdropPress={toggleMedical}
+                      animationIn="fadeInUp"
+                      animationInTiming={200}
+                      animationOut="fadeOutDown"
+                      animationOutTiming={200}
+                      style={{ margin: 0 }}
+                    >
+                      <View style={{
+                        backgroundColor: isDarkMode === 'light' ? pawLightGrey : pawWhite, padding: 30, paddingBottom: 10, borderRadius: 50,
+                      }}
+                      >
+                        { catDog === 'dog' ? (displayDogVaccines()) : (displayCatVaccines())}
+
+                        <Pressable
+                          style={[styles.submitbutton, { width: Dimensions.get('window').width - 40, backgroundColor: isDarkMode === 'light' ? pawYellow : pawPink }]}
+                          onPress={() => {
+                            addVaccineToPet();
+                            toggleAddVaccine();
+                          }}
+                        >
+                          <Text
+                            style={styles.submittext}
+                          >
+                            Add Vaccination
+                          </Text>
+                        </Pressable>
+
+                        <AwesomeAlert
+                          show={vaccineAdded}
+                          title="Vaccine Added!"
+                          confirmText="Yay!"
+                          titleStyle={styles.alertText}
+                          contentContainerStyle={styles.alertBackground}
+                          showConfirmButton
+                          confirmButtonTextStyle={styles.confirmButton}
+                          onConfirmPressed={() => {
+                            toggleAddVaccine();
+                            toggleMedical();
+                          }}
+                          style={{ borderRadius: 50, overflow: 'hidden' }}
+                          confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+                        />
+                      </View>
+                    </Modal>
                   </View>
                 </Animated.ScrollView>
               </KeyboardAwareScrollView>
@@ -396,6 +981,19 @@ export default function PetCard({ pet }) {
           </Pressable>
 
           <AwesomeAlert
+            show={deleteSuccess}
+            title="Pet Deleted!"
+            confirmText="Yay!"
+            titleStyle={styles.alertText}
+            contentContainerStyle={styles.alertBackground}
+            showConfirmButton
+            confirmButtonTextStyle={styles.confirmButton}
+            onConfirmPressed={closeAll}
+            style={{ borderRadius: 50, overflow: 'hidden' }}
+            confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
+          />
+
+          <AwesomeAlert
             show={petRemoved}
             title="Are you sure?"
             confirmText="Cancel"
@@ -407,7 +1005,7 @@ export default function PetCard({ pet }) {
             confirmButtonTextStyle={styles.confirmButton}
             cancelButtonTextStyle={styles.confirmButton}
             onConfirmPressed={toggleRemove}
-            onCancelPressed={removePetFromDB}
+            onCancelPressed={() => { toggleRemove(); removePetFromDB(); }}
             style={{ borderRadius: 50, overflow: 'hidden' }}
             confirmButtonColor={isDarkMode === 'light' ? pawGreen : pawPink}
             cancelButtonColor={isDarkMode === 'light' ? '#d94545' : '#b81d1d'}

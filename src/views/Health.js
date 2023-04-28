@@ -5,7 +5,7 @@ import {
   Keyboard,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import RNAnimatedScrollIndicators from 'react-native-animated-scroll-indicators';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Collapsible from '@eliav2/react-native-collapsible-view';
@@ -13,11 +13,15 @@ import DatePicker, { getToday, getFormatedDate } from 'react-native-modern-datep
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import * as Calendar from 'expo-calendar';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import Modal from 'react-native-modal';
 import lstyles, { pawPink, pawWhite, pawGrey } from '../constants/Styles';
 import dstyles, { pawLightGrey, pawYellow, pawGreen } from '../constants/DarkStyles';
+import { setCalendarID } from '../redux/CalendarSlice';
+import { setHasLoaded } from '../redux/CardLoaderSlice';
 import PetCard from '../components/PetCard';
-// import HealthComponent from '../components/HealthComponent';
 import UpcomingAppointments from '../components/UpcomingAppointments';
 import WalkGraph from '../components/WalkGraph';
 import WalkGoals from '../components/WalkGoals';
@@ -30,20 +34,35 @@ import catBreeds from '../constants/catBreeds.json';
 const dBreeds = dogBreeds.breeds;
 const cBreeds = catBreeds.breeds;
 const PickerItem = Picker.Item;
-const miso = require('../../assets/petPhotos/miso.jpg');
+const defaultLogo = require('../../assets/Paw5Logo-limited.png');
 
 const emptyList = [];
 
 const _ = Network();
 
+let newID = '';
+
+async function getCurrentCalendar() {
+  const existingCalendar = await AsyncStorage.getItem('@calendarID');
+  newID = existingCalendar;
+  return existingCalendar;
+}
+
 export default function HealthTab() {
+  const dispatch = useDispatch();
   const [styles, setStyles] = useState(lstyles);
-  const [hasLoadedPets, setHasLoadedPets] = useState(false);
   const [petCards, setPetCards] = useState(() => []);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
   const [userId, setUserId] = useState(0);
   const [selectedDate, setSelectedDate] = useState(getFormatedDate(getToday(), 'MM/DD/YYYY'));
   const [formEntry, setFormEntry] = useState({});
+  const defaultCalendar = useSelector((state) => state.calendar.calendarID);
+  const hasLoaded = useSelector((state) => state.cardLoader.hasLoaded);
+  const [image, setImage] = useState(defaultLogo);
+  const [isPicVisible, setPicVisible] = useState(false);
+  const togglePic = () => {
+    setPicVisible(!isPicVisible);
+  };
 
   if (!userId) {
     _.get('login').then((response) => {
@@ -52,6 +71,43 @@ export default function HealthTab() {
       });
     });
   }
+
+  // add pic to database
+  const addPictoPet = async (petID) => {
+    if (image) {
+      const imageFetch = await fetch(image);
+      const blob = await imageFetch.blob();
+      const networkResponse = await _.postImage(`pics/pets/${petID}/${image.split('/').slice(-1)[0]}`, blob, {
+        headers: {
+          'Content-Type': 'image/jpeg',
+        },
+      });
+      networkResponse.onClientError((results) => {
+        console.log(results);
+        console.log('yay');
+      });
+    }
+  };
+
+  const newImageAdded = async () => {
+    const newImage = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      allowsEditing: true,
+      aspect: [4, 4],
+    });
+    setImage(newImage);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Calendar.requestCalendarPermissionsAsync();
+      if (status === 'granted' && defaultCalendar === 'none') {
+        await getCurrentCalendar();
+        dispatch(setCalendarID(newID));
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (isDarkMode === 'light') setStyles(dstyles);
@@ -69,23 +125,63 @@ export default function HealthTab() {
     setAddVisible(!isAddVisible);
   };
 
-  const addPetToDB = async () => {
-    const networkResponse = await _.post(`pets/${userId}`, formEntry);
-    networkResponse.onSuccess(() => {
-      setFormEntry({});
-    });
-  };
-
   const updateFormEntry = (key, value) => {
     const newFormEntry = formEntry;
     newFormEntry[key] = value;
     setFormEntry(newFormEntry);
   };
 
+  function addDay(date) {
+    const endDay = new Date(date);
+    return endDay.setDate(endDay.getDate() + 1);
+  }
+
+  async function addBirthdayToCalendar(petInfo) {
+    const newEvent = {
+      title: `${petInfo.pet_name}'s Birthday`,
+      startDate: new Date(petInfo.custom_info),
+      endDate: new Date(addDay(petInfo.custom_info)),
+      allDay: (true),
+      recurrenceRule: {
+        frequency: Calendar.Frequency.YEARLY,
+      },
+    };
+
+    updateFormEntry('event_id', await Calendar.createEventAsync(defaultCalendar, newEvent));
+  }
+
   const [selectedItem, setSelectedItem] = useState('Select Breed');
   const [animalValue, setAnimalValue] = useState('Select Animal');
   const [itemList, setAnimal] = useState(emptyList);
   const [autofillText, setAutofillText] = useState('');
+  const [cardIndex, setCardIndex] = useState(0);
+  const [selectedPet, setSelectedPet] = useState(petCards[0]);
+
+  const scrollX = new Animated.Value(0);
+  scrollX.addListener(({ value }) => {
+    setCardIndex(Math.round(value / 390));
+    setSelectedPet(petCards[cardIndex - 1]);
+  });
+  scrollX.removeListener();
+
+  function resetAddForm() {
+    setSelectedDate(getFormatedDate(getToday(), 'MM/DD/YYYY'));
+    setSelectedItem('Select Breed');
+    setAnimalValue('Select Animal');
+    setAnimal(emptyList);
+    setAutofillText('');
+  }
+
+  const addPetToDB = async () => {
+    addBirthdayToCalendar(formEntry);
+
+    const networkResponse = await _.post(`pets/${userId}`, formEntry);
+    networkResponse.onSuccess((response) => {
+      addPictoPet(response.data.pet_id);
+      resetAddForm();
+      setFormEntry({});
+    });
+  };
 
   /* toggle date modal */
   const [isDateVisible, setDateVisible] = useState(false);
@@ -96,10 +192,10 @@ export default function HealthTab() {
   const closeAll = () => {
     showPetAdded(false);
     setAddVisible(false);
-    setHasLoadedPets(false);
+    dispatch(setHasLoaded(false));
   };
 
-  if (userId && !hasLoadedPets) {
+  if (userId && !hasLoaded) {
     _.get('pets', {
       params: {
         user_id: userId,
@@ -108,19 +204,9 @@ export default function HealthTab() {
       const pets = results.data().results;
 
       setPetCards(pets);
-      setHasLoadedPets(true);
+      dispatch(setHasLoaded(true));
     });
   }
-
-  const [cardIndex, setCardIndex] = useState(0);
-  const [selectedPet, setSelectedPet] = useState(petCards[0]);
-
-  const scrollX = new Animated.Value(0);
-  scrollX.addListener(({ value }) => {
-    setCardIndex(Math.round(value / 390));
-    setSelectedPet(petCards[cardIndex - 1]);
-  });
-  scrollX.removeListener();
 
   return (
 
@@ -154,7 +240,9 @@ export default function HealthTab() {
           >
 
             <View style={styles.transparentBG}>
-              <Pressable style={styles.petCard} onPress={toggleAdd}>
+              <Pressable
+                style={styles.petCard}
+              >
                 <Feather
                   name="home"
                   size={80}
@@ -197,6 +285,7 @@ export default function HealthTab() {
                     <Pressable
                       onPress={toggleAdd}
                       style={{ alignSelf: 'flex-start' }}
+                      hitSlop={20}
                     >
                       <Feather
                         name="chevron-left"
@@ -212,9 +301,9 @@ export default function HealthTab() {
                         <Image
                           resizeMode="cover"
                           style={styles.profileIcon}
-                          source={miso}
+                          source={image}
                         />
-                        <Pressable>
+                        <Pressable onPress={togglePic}>
                           <Feather
                             name="camera"
                             size={30}
@@ -222,6 +311,37 @@ export default function HealthTab() {
                             style={styles.cameraIcon}
                           />
                         </Pressable>
+                        <Modal
+                          isVisible={isPicVisible}
+                          onBackdropPress={togglePic}
+                          animationIn="fadeInUp"
+                          animationInTiming={200}
+                          animationOut="fadeOutDown"
+                          animationOutTiming={200}
+                        >
+                          <View style={styles.addPetPicContainer}>
+                            <Pressable onPress={newImageAdded} style={styles.addPetPicButton}>
+                              <Feather
+                                name="plus-circle"
+                                size={30}
+                                color={isDarkMode === 'light' ? pawLightGrey : pawGreen}
+                                style={styles.addButton}
+                              />
+                              {image && <Image source={image} style={[styles.addPetPic, { position: 'absolute' }]} />}
+                            </Pressable>
+
+                            <Pressable
+                              style={[styles.submitbutton, { width: Dimensions.get('window').width - 70, marginTop: 20 }]}
+                              onPress={togglePic}
+                            >
+                              <Text
+                                style={styles.submittext}
+                              >
+                                Submit
+                              </Text>
+                            </Pressable>
+                          </View>
+                        </Modal>
                       </View>
                     </View>
 

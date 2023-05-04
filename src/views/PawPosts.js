@@ -21,7 +21,7 @@ export default function PawPics() {
 
   if (!hasLoaded) {
     _.get('posts').then((results) => {
-      const post = results.data();
+      const post = results.data().results;
       setPostList(post);
       dispatch(setHasLoaded(true));
     });

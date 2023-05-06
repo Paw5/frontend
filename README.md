@@ -1,7 +1,7 @@
 <div id="top"></div>
 <div align="center">
   <a href="https://github.com/Paw5" height="60" width="45">
-    <img src="assets/Paw5Logo.png" alt="Logo">
+    <img src="assets/paw5ReadmePic.png" alt="Logo">
   </a>
   
   <p align="center">

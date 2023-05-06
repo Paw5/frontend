@@ -184,7 +184,7 @@ export default function HealthTab() {
 
     const networkResponse = await _.post(`pets/${userId}`, formEntry);
     networkResponse.onSuccess((response) => {
-      console.log(response.config.data.pet_id);
+      console.log(response);
       // addPictoPet(response.data.pet_id);
       resetAddForm();
       setFormEntry({});

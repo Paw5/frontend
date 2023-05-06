@@ -48,7 +48,15 @@ Paw5 is an app that helps organize all facets of pet ownership neatly into five 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Usage
-To be added.
+After installing [![Nodejs]][Nodejsurl] and cloning the repositorys.
+Run the command below in both the Frontend and Backend repos to install the other necessary dependencies:
+```
+npm install
+```
+To run either app, run the command below in the repos home directory.:
+```
+npm start
+```
 <br />
 
 <p align="right">(<a href="#top">back to top</a>)</p>

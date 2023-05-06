@@ -1,0 +1,15 @@
+{"serviceTypes" : 
+    [
+       "Type",
+       "Store",
+       "Hotel",
+       "Restaurant",
+       "Park",
+       "Library",
+       "School",
+       "Fast-Food",
+       "Vet",
+       "Hospital",
+       "Groomers"
+    ]
+}

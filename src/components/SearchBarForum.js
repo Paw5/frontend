@@ -8,8 +8,9 @@ import Modal from 'react-native-modal';
 import { Picker } from '@react-native-picker/picker';
 import lstyles, { pawGrey, pawGreen } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
-import TypeList from '../constants/typeList.json';
-import SortList from '../constants/sortOptionsServ.json';
+import TagList from '../constants/tagList.json';
+import SortList from '../constants/sortOptionsForum.json';
+import UploadDate from '../constants/uploadDate.json';
 
 export default function SearchBar(searchQuery) {
 // each filter option will have its own API to get that specific data
@@ -24,15 +25,11 @@ export default function SearchBar(searchQuery) {
   }, [isDarkMode]);
 
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isChecked1, setChecked1] = useState(false);
-  const [isChecked2, setChecked2] = useState(false);
-  const [isChecked3, setChecked3] = useState(false);
-  const [isChecked4, setChecked4] = useState(false);
-  const [isChecked5, setChecked5] = useState(false);
   const [selectedType, setSelectedType] = useState('Type');
   const [selectedSort, setSelectedSort] = useState('Rating');
-  const [typeList] = useState(TypeList.serviceTypes);
+  const [tagList] = useState(TagList.tags);
   const [rateList] = useState(SortList.sortOptions);
+  const [uploadDate] = useState(UploadDate.uploadDate);
 
   return (
     <View style={styles.container}>
@@ -60,7 +57,7 @@ export default function SearchBar(searchQuery) {
                 selectedValue={selectedType}
                 onValueChange={(index) => setSelectedType(index)}
               >
-                {typeList.map((value) => (
+                {tagList.map((value) => (
                   <PickerItem label={value} value={value} key={value} />
                 ))}
               </Picker>
@@ -83,76 +80,22 @@ export default function SearchBar(searchQuery) {
 
             </TouchableHighlight>
           </View>
-          <View style={{
-            flexDirection: 'row', flex: 1, margin: 5, alignSelf: 'center', marginTop: 10,
+          <TouchableHighlight style={{
+            borderColor: pawGreen, borderRadius: 50, borderWidth: 2, width: 250, height: 40, justifyContent: 'center', margin: 5, alignSelf: 'center',
           }}
           >
-            <Pressable
-              onPress={() => setChecked1(!isChecked1)}
+            <Picker
+              style={styles.signintext}
+              itemStyle={styles.signintext}
+              selectedValue={selectedType}
+              onValueChange={(index) => setSelectedType(index)}
             >
-              <Feather
-                name="star"
-                size={35}
-                fill={pawYellow}
-                color={isChecked1 ? pawYellow : pawGrey}
-              />
-            </Pressable>
-            <Pressable onPress={() => {
-              setChecked2(!isChecked2);
-              setChecked1(!isChecked1);
-            }}
-            >
-              <Feather
-                name="star"
-                size={35}
-                fill={pawYellow}
-                color={isChecked2 ? pawYellow : pawGrey}
-              />
-            </Pressable>
-            <Pressable onPress={() => {
-              setChecked3(!isChecked3);
-              setChecked2(!isChecked2);
-              setChecked1(!isChecked1);
-            }}
-            >
-              <Feather
-                name="star"
-                size={35}
-                fill={pawYellow}
-                color={isChecked3 ? pawYellow : pawGrey}
-              />
-            </Pressable>
-            <Pressable onPress={() => {
-              setChecked4(!isChecked4);
-              setChecked3(!isChecked3);
-              setChecked2(!isChecked2);
-              setChecked1(!isChecked1);
-            }}
-            >
-              <Feather
-                name="star"
-                size={35}
-                fill={pawYellow}
-                color={isChecked4 ? pawYellow : pawGrey}
-              />
-            </Pressable>
-            <Pressable onPress={() => {
-              setChecked5(!isChecked5);
-              setChecked4(!isChecked4);
-              setChecked3(!isChecked3);
-              setChecked2(!isChecked2);
-              setChecked1(!isChecked1);
-            }}
-            >
-              <Feather
-                name="star"
-                size={35}
-                fill={pawYellow}
-                color={isChecked5 ? pawYellow : pawGrey}
-              />
-            </Pressable>
+              {uploadDate.map((value) => (
+                <PickerItem label={value} value={value} key={value} />
+              ))}
+            </Picker>
 
-          </View>
+          </TouchableHighlight>
           <Pressable
             style={[styles.filtersClose]}
             onPress={() => setModalVisible(!isModalVisible)}
@@ -165,6 +108,7 @@ export default function SearchBar(searchQuery) {
           </Pressable>
 
         </View>
+
       </Modal>
       <KeyboardAvoidingView
         behavior="height"

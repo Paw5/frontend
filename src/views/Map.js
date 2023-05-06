@@ -418,7 +418,7 @@ export default function MapTab() {
             />
           </View>
           <Image
-            source={pfNow === true ? PetF : noPetF}
+            source={pfNow === false ? PetF : noPetF}
             style={{
               height: 120, width: 120, margin: 10, marginLeft: 30,
             }}

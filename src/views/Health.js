@@ -74,15 +74,22 @@ export default function HealthTab() {
 
   // add pic to database
   const addPictoPet = async (petID) => {
+    console.log(image);
     if (image) {
       const imageFetch = await fetch(image);
       const blob = await imageFetch.blob();
+      console.log(blob);
       const networkResponse = await _.postImage(`pics/pets/${petID}/${image.split('/').slice(-1)[0]}`, blob, {
         headers: {
           'Content-Type': 'image/jpeg',
         },
       });
+      console.log(networkResponse);
       networkResponse.onClientError((results) => {
+        console.log(results);
+        console.log('boo');
+      });
+      networkResponse.onSuccess((results) => {
         console.log(results);
         console.log('yay');
       });
@@ -177,7 +184,8 @@ export default function HealthTab() {
 
     const networkResponse = await _.post(`pets/${userId}`, formEntry);
     networkResponse.onSuccess((response) => {
-      addPictoPet(response.data.pet_id);
+      console.log(response);
+      // addPictoPet(response.data.pet_id);
       resetAddForm();
       setFormEntry({});
     });
@@ -249,7 +257,7 @@ export default function HealthTab() {
                   color={isDarkMode === 'light' ? pawGreen : pawPink}
                   style={{ marginRight: -5, marginBottom: 25 }}
                 />
-                <Text style={styles.petHeader}>Home</Text>
+                <Text style={[styles.petHeader, { width: 160 }]}>Home</Text>
               </Pressable>
             </View>
 
@@ -264,7 +272,7 @@ export default function HealthTab() {
                   color={isDarkMode === 'light' ? pawGreen : pawPink}
                   style={{ marginRight: -5, marginBottom: 25 }}
                 />
-                <Text style={styles.petHeader}>Add Pet</Text>
+                <Text style={[styles.petHeader, { width: 160 }]}>Add Pet</Text>
 
               </Pressable>
             </View>

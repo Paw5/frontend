@@ -443,7 +443,7 @@ export default function PetCard({ pet }) {
           />
 
           <View style={styles.accountHeaderView}>
-            <Text style={styles.petHeader}>{petName}</Text>
+            <Text style={styles.petHeader} adjustsFontSizeToFit numberOfLines={1}>{petName}</Text>
             <Pressable onPress={toggleEdit}>
               <Feather
                 name="settings"

@@ -122,6 +122,9 @@ export default StyleSheet.create({
     shadowRadius: 2,
   },
   petHeader: {
+    alignSelf: 'flex-end',
+    textAlign: 'center',
+    width: 110,
     fontSize: 32,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -1936,7 +1939,6 @@ export default StyleSheet.create({
   },
   indianRedXCircle: {
     alignSelf: 'center',
-    paddingLeft: 10,
     paddingTop: 10,
   },
   eventBottomBorder: {

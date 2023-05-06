@@ -7,7 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import lstyles, { pawGrey } from '../constants/Styles';
 import dstyles, { pawYellow } from '../constants/DarkStyles';
 
-const miso = require('../../assets/petPhotos/miso.jpg');
+const miso = require('../../assets/Paw5Logo-limited.png');
 
 export default function ServNode({
   name, rate, desc, pf,

@@ -3,7 +3,7 @@ import {
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import SearchBar from '../components/SearchBarServ';
+import SearchBar from '../components/SearchBarPM';
 import lstyles, { } from '../constants/Styles';
 import dstyles from '../constants/DarkStyles';
 import PMUserInteraction from '../components/PMInteraction';

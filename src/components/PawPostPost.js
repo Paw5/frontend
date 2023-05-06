@@ -11,7 +11,7 @@ import PawPostComment from './PawPostComment';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
-export default function PawPostPost() {
+export default function PawPostPost({ id, body }) {
   const [styles, setStyles] = useState(lstyles);
   const isDarkMode = useSelector((state) => state.settings.darkMode);
 
@@ -24,6 +24,7 @@ export default function PawPostPost() {
   const togglePost = () => {
     setPostVisible(!isPostVisible);
   };
+
   return (
     <View>
       <Pressable
@@ -34,17 +35,15 @@ export default function PawPostPost() {
           paddingLeft: 0, top: 30, paddingBottom: 50, paddingRight: 10,
         }]}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit,sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute i
-          dolor in reprehenderit in voluptate velit esse cillum dolore eu fiat nulla paatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
+          {body}
 
         </Text>
       </Pressable>
       <Pressable style={[styles.ppoProfileNameNode, { zIndex: 48, alignSelf: 'center' }]}>
-        <Text style={[styles.postHeader2, { zIndex: 49 }]}>@user-name</Text>
+        <Text style={[styles.postHeader2, { zIndex: 49 }]}>
+          @
+          {id}
+        </Text>
       </Pressable>
       <Image
         style={[styles.ppoProfileImage, { zIndex: 50 }]}

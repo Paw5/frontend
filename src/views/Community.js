@@ -13,12 +13,16 @@ import dstyles, {
 } from '../constants/DarkStyles';
 import ProfilePhotoCard from '../components/ProfilePhotoCard';
 import ProfilePostCard from '../components/ProfilePostCard';
+import Network from '../util/Network';
 
 const miso = require('../../assets/petPhotos/miso.jpg');
 
+const _ = Network();
+
 export default function CommunityTab(bioUpdate) {
+  const [newText, setNewText] = useState({});
   const [styles, setStyles] = useState(lstyles);
-  const [image, setImage] = useState(null); // *** PASS image.uri TO DATABASE? ***
+  const [image, setImage] = useState(null);
   const newImageAdded = async () => {
     const newImage = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -48,6 +52,21 @@ export default function CommunityTab(bioUpdate) {
     if (isNewPostVisible) {
       setNewPostVisible(!isNewPostVisible);
     }
+  };
+
+  const newTextEntry = newText;
+
+  const addTextPostToDB = async () => {
+    const networkResponse = await _.post('posts', newText);
+    networkResponse.onSuccess(() => {
+      toggleNewText();
+      setNewText({});
+    });
+  };
+
+  const updateNewText = (key, value) => {
+    newTextEntry[key] = value;
+    setNewText(newTextEntry);
   };
 
   const [isNewImageVisible, setNewImageVisible] = useState(false);
@@ -267,7 +286,7 @@ export default function CommunityTab(bioUpdate) {
               />
             </Pressable>
             <Pressable
-              onPress={toggleNewText/* ** SEND TEXT POST TO DATABASE AND CLOSE MODAL ** */}
+              onPress={addTextPostToDB}
               style={{
                 position: 'absolute', alignSelf: 'flex-end', right: 10, top: 10,
               }}
@@ -285,7 +304,7 @@ export default function CommunityTab(bioUpdate) {
               style={[styles.input, { margin: 10, alignSelf: 'flex-start' }]}
               placeholder="Input Text Post"
               placeholderTextColor={isDarkMode === 'light' ? '#edae4985' : '#33333385'}
-              // value={ **NOT SURE WHAT IS NEEDED FOR DATABASE **}
+              onChangeText={(text) => updateNewText('body', text)}
 
             />
           </View>
